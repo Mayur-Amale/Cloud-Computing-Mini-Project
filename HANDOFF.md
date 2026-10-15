@@ -5,9 +5,9 @@
 - **Current Scope:**
   - A fully functional, responsive Single Page Application (SPA) with client-side hash routing (`#/login`, `#/student-dashboard`, `#/subject-and-assignments`, `#/assignment-upload`, `#/student-submission`, `#/teacher-dashboard`, `#/teacher-review`).
   - Updated standalone Stitch screen templates in `stitch_student_drive_academic_portal/` with full theme parity and cross-navigation.
-  - Realistic mock data and state persistence via browser `localStorage`.
+  - Frontend reads and writes through `/api`; local mode persists records in `data/student_drive_db.json` and AWS mode uses the DynamoDB adapter.
   - Zero remaining prototype blue branding; fully converted to the college's Maroon, White, and Gold design system.
-  - Preparation for real AWS cloud services (Cognito, private S3 pre-signed uploads, DynamoDB).
+  - AWS mode can sign private S3 uploads and validate Cognito ID tokens when configured. This workspace has not been connected to or verified against an AWS account.
 
 ---
 
@@ -119,25 +119,30 @@ Cloud-Computing-Mini-Project/
    - Submission artifact inspection with S3 key, SHA-256 validation tag, and syntax-highlighted code viewer (`server_socket_echo.py`).
    - Interactive rubric sliders (Correctness, Modularity, Tests, Docs) that dynamically recalculate the total score /100.
    - Editable feedback textarea.
-   - Functional **"Request Changes"** and **"Approve & Record"** buttons that immediately mutate the submission in `localStorage` and trigger instant toast notifications.
+   - Functional **"Request Changes"** and **"Approve & Record"** buttons that persist review records through the backend API.
 8. **Responsive Navigation & Role Switcher:**
    - Click the role switch icon in the top header or sidebar to hot-swap between Alex Chen (Student) and Dr. Evelyn Reed (Teacher) at any time.
    - Hamburger drawer menu for viewport widths under 1024px.
+9. **Backend persistence:**
+   - `backend/storage/local-store.js` provides persistent local JSON storage; `backend/storage/dynamodb-store.js` provides a single-table DynamoDB adapter with GSIs.
+   - API entities are normalized into the existing Stitch UI model so stored submissions can be opened and reviewed.
 
 ---
 
 ## 6. Features Still Missing or Simulated (Demo Sandbox)
 
-- **Simulated Authentication:** Login validates form inputs and sets role state in memory/localStorage without contacting AWS Cognito.
-- **Simulated S3 Uploads:** File bytes are validated in the browser; the upload progress bar simulates pre-signed PUT streaming. Files are not sent to an active AWS S3 bucket.
+- **Authentication:** The login UI remains a demo selector. Local mode trusts demo identity headers and must not be exposed as production authentication. AWS auth mode verifies Cognito ID-token signatures and requires a matching portal user record.
+- **S3 in local mode:** File bytes go to the local mock endpoint and are not retained as files. AWS mode uses pre-signed PUT URLs when AWS credentials and bucket permissions are configured.
 - **Simulated Downloads:** Syllabus and submission downloads verify permissions and show toast notifications rather than downloading actual binary blobs.
-- **State Storage:** Shared portal state persists in browser `localStorage`. Resetting browser data restores the default sample data.
+- **State Storage:** Local API records persist in `data/student_drive_db.json`; `localStorage` is only the frontend cache. DynamoDB mode has not been exercised against a live AWS table in this workspace.
 
 ---
 
 ## 7. Current Errors or Blockers
 
-- **None.** The Node server runs without errors (`node server.js`), all screens render with zero CSS/JS console errors, all 7 flows navigate cleanly, and browser subagent verification tests passed successfully.
+- AWS resources and Cognito settings are not configured here. Do not treat the UI's AWS status badge as proof of a successful live integration; API data sync must succeed too.
+- The demo sign-in screen has not been replaced with Cognito sign-in. In `AUTH_MODE=cognito`, callers need a valid Cognito ID token and a matching portal user record.
+- Downloads are still presentation-only. Local mock uploads count bytes but do not retain the uploaded file.
 
 ---
 
@@ -146,27 +151,20 @@ Cloud-Computing-Mini-Project/
 - **Zero-Dependency Server:** Standard `node:http` and `node:fs` were chosen for `server.js` so any developer or automated agent can immediately run the application without running `npm install`.
 - **Hybrid Architecture:** Both a single-page interactive portal (`index.html`) AND updated standalone Stitch templates (`stitch_student_drive_academic_portal/*/code.html`) are maintained so the repository functions seamlessly whether opened directly by file or served over HTTP.
 - **No Secrets in Code:** In strict adherence to security guidelines, no AWS access keys, secret keys, or bucket ARNs are embedded in the frontend code.
-- **Environment Variables (For Future Backend Hookup):**
+- **Environment Variables:**
   - `PORT`: Optional port override for local server (defaults to `3000`).
   - `AWS_REGION`: Target region for Cognito and S3 (e.g. `ap-south-1` or `us-east-1`).
-  - `COGNITO_USER_POOL_ID`: Future Cognito User Pool ID.
-  - `COGNITO_CLIENT_ID`: Future Cognito App Client ID.
-  - `S3_BUCKET_NAME`: Target private S3 bucket name (e.g. `student-drive-assignments-dyp-dpu`).
+  - `COGNITO_USER_POOL_ID`: User Pool ID used by backend ID-token verification.
+  - `COGNITO_CLIENT_ID`: App client ID accepted by backend ID-token verification.
+  - `S3_BUCKET`: Target private S3 bucket (default `student-drive-assignments-dyp-dpu`).
+  - `AUTH_MODE`: `cognito` for verified Cognito tokens; defaults to `demo` with local/DynamoDB Local storage and `cognito` for AWS storage.
 
 ---
 
 ## 9. Next 3–5 Concrete Tasks (In Priority Order)
 
-1. **Deploy Frontend to AWS S3 & CloudFront:**
-   - Create an automated script or CDK/Terraform stack to push `index.html`, `public/`, and `stitch_student_drive_academic_portal/` to an S3 bucket configured for static website hosting behind an Amazon CloudFront distribution with HTTPS.
-2. **Implement Real AWS S3 Pre-Signed Upload Lambda:**
-   - Write a Node.js/Python AWS Lambda function exposed via API Gateway that accepts `{ fileName, fileType, assignmentId, studentRoll }`, validates user authentication, and calls `s3.getSignedUrlPromise('putObject', ...)` with 15-minute expiration and max size constraints.
-   - Update `submitAssignmentWork()` in `index.html` to fetch this pre-signed URL and execute `fetch(presignedUrl, { method: 'PUT', body: file })`.
-3. **Configure AWS Cognito Authentication:**
-   - Create an AWS Cognito User Pool with custom attributes (`custom:roll_no`, `custom:role`) and groups (`Students`, `Faculty`).
-   - Integrate AWS Amplify Auth in `index.html` to swap out mock sign-in for real SRP/OAuth2 sign-in.
-4. **Provision DynamoDB Submission & Rubric Tables:**
-   - Create a DynamoDB table `StudentDrive_Submissions` (Partition Key: `assignment_id`, Sort Key: `student_id#version`).
-   - Create CRUD API endpoints for fetching submissions, updating rubric scores, and recording teacher feedback.
-5. **Add Client-Side File Extraction / Multi-File Previewer:**
-   - Integrate JSZip in `#/teacher-review` to extract uploaded `.zip` archives directly in the browser so faculty can view all project files in a file-tree explorer without having to download the zip file locally.
+1. **Connect AWS resources:** Provision `StudentDrive_Main` with `scripts/setup-dynamodb.js`, configure a private S3 bucket and its CORS policy, then use an IAM role scoped to the table and bucket.
+2. **Complete Cognito sign-in:** Replace demo login and identity headers with Cognito sign-in that sends a verified ID token; map Cognito identities to seeded portal users and roles.
+3. **Validate cloud flows:** Check DynamoDB reads/writes, S3 upload and failure handling, and teacher review against a non-production AWS environment before describing these as live.
+4. **Add real file retrieval:** Use an authenticated backend route to issue short-lived S3 GET links for syllabus and submission downloads.
+5. **Improve assignment and roster management:** Add enrollment checks and teacher-facing assignment creation backed by the existing API.

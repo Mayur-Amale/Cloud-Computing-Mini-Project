@@ -10,13 +10,8 @@ function getStorage() {
   }
 
   if (config.STORAGE_MODE === 'aws') {
-    try {
-      storageInstance = new DynamoDBStorageManager();
-      console.log(`[Storage] Running in AWS DynamoDB Mode (Table: ${config.AWS.DYNAMODB_TABLE}, Region: ${config.AWS.REGION})`);
-    } catch (err) {
-      console.warn(`[Storage] Failed to initialize AWS DynamoDB, falling back to Local Mock Mode:`, err.message);
-      storageInstance = new LocalStorageManager();
-    }
+    storageInstance = new DynamoDBStorageManager();
+    console.log(`[Storage] Running in AWS DynamoDB Mode (Table: ${config.AWS.DYNAMODB_TABLE}, Region: ${config.AWS.REGION})`);
   } else {
     storageInstance = new LocalStorageManager();
     console.log(`[Storage] Running in LOCAL MOCK Mode (Persistence file: ${config.LOCAL_DB_FILE})`);

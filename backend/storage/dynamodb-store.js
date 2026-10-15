@@ -244,9 +244,25 @@ class DynamoDBStorageManager {
   }
 
   async createSubmission(sub) {
-    const submissionId = sub.submissionId || `sub-${Date.now()}`;
+    const prior = (await this.listSubmissions({ studentId: sub.studentId }))
+      .find(item => item.assignmentId === sub.assignmentId);
+    const submissionId = prior?.submissionId || sub.submissionId || `sub-${Date.now()}`;
     const submittedAt = new Date().toISOString();
-    const version = sub.version || 'v1.0';
+    const revisions = prior?.revisions || [];
+    let version = sub.version || `v1.${revisions.length}`;
+    if (revisions.some(revision => revision.version === version)) {
+      const match = /^v(\d+)\.(\d+)$/.exec(version);
+      version = match ? `v${match[1]}.${Number(match[2]) + 1}` : `v1.${revisions.length}`;
+    }
+    const revision = {
+      version,
+      fileName: sub.fileName,
+      fileSize: sub.fileSize,
+      s3Key: sub.s3Key,
+      submittedAt,
+      comment: sub.comment || 'Submission revision'
+    };
+    const allRevisions = [revision, ...revisions];
 
     const item = {
       PK: `SUBMISSION#${submissionId}`,
@@ -257,10 +273,16 @@ class DynamoDBStorageManager {
       GSI4SK: `STATUS#${sub.status || 'Pending Review'}#${submittedAt}`,
       entityType: 'SUBMISSION',
       ...sub,
+      ...(prior || {}),
+      ...sub,
       submissionId,
       version,
       submittedAt,
-      status: sub.status || 'Pending Review'
+      status: sub.status || 'Pending Review',
+      revisions: allRevisions,
+      feedback: '',
+      reviewedBy: null,
+      reviewedAt: null
     };
 
     // Save main submission metadata
@@ -276,12 +298,8 @@ class DynamoDBStorageManager {
       PK: `SUBMISSION#${submissionId}`,
       SK: `REVISION#${version}`,
       entityType: 'REVISION',
-      version,
-      fileName: sub.fileName,
-      fileSize: sub.fileSize,
-      s3Key: sub.s3Key,
-      submittedAt,
-      comment: sub.comment || 'Submission revision'
+      ...revision,
+      entityType: 'REVISION'
     };
 
     await this.docClient.send(

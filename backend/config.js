@@ -16,6 +16,11 @@ module.exports = {
   DATA_DIR: path.resolve(__dirname, '..', 'data'),
   LOCAL_DB_FILE: path.resolve(__dirname, '..', 'data', 'student_drive_db.json'),
   STORAGE_MODE: storageMode,
+  AUTH_MODE: (process.env.AUTH_MODE || (storageMode === 'aws' && !process.env.DYNAMODB_ENDPOINT ? 'cognito' : 'demo')).toLowerCase(),
+  COGNITO: {
+    USER_POOL_ID: process.env.COGNITO_USER_POOL_ID || null,
+    CLIENT_ID: process.env.COGNITO_CLIENT_ID || null
+  },
   AWS: {
     REGION: process.env.AWS_REGION || 'us-east-1',
     DYNAMODB_TABLE: process.env.DYNAMODB_TABLE || 'StudentDrive_Main',

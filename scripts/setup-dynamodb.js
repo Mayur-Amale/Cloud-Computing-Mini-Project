@@ -23,6 +23,18 @@ const {
 const config = require('../backend/config');
 const seedData = require('../backend/storage/seed-data');
 
+async function putSeedIfMissing(docClient, item) {
+  try {
+    await docClient.send(new PutCommand({
+      TableName: config.AWS.DYNAMODB_TABLE,
+      Item: item,
+      ConditionExpression: 'attribute_not_exists(PK) AND attribute_not_exists(SK)'
+    }));
+  } catch (err) {
+    if (err.name !== 'ConditionalCheckFailedException') throw err;
+  }
+}
+
 async function setupDynamoDB() {
   console.log('====================================================');
   console.log(' Amazon DynamoDB Table Setup & Provisioning Script ');
@@ -132,62 +144,44 @@ async function setupDynamoDB() {
 
   // Users
   for (const user of seedData.users) {
-    await docClient.send(
-      new PutCommand({
-        TableName: config.AWS.DYNAMODB_TABLE,
-        Item: {
+    await putSeedIfMissing(docClient, {
           PK: `USER#${user.userId}`,
           SK: 'PROFILE',
           entityType: 'USER',
           ...user
-        }
-      })
-    );
+        });
   }
   console.log(`[Seed] Seeded ${seedData.users.length} user records.`);
 
   // Subjects
   for (const subject of seedData.subjects) {
-    await docClient.send(
-      new PutCommand({
-        TableName: config.AWS.DYNAMODB_TABLE,
-        Item: {
+    await putSeedIfMissing(docClient, {
           PK: `SUBJECT#${subject.subjectCode}`,
           SK: 'METADATA',
           GSI1PK: `TEACHER#${subject.instructorId}`,
           GSI1SK: `SUBJECT#${subject.subjectCode}`,
           entityType: 'SUBJECT',
           ...subject
-        }
-      })
-    );
+        });
   }
   console.log(`[Seed] Seeded ${seedData.subjects.length} subject records.`);
 
   // Assignments
   for (const asg of seedData.assignments) {
-    await docClient.send(
-      new PutCommand({
-        TableName: config.AWS.DYNAMODB_TABLE,
-        Item: {
+    await putSeedIfMissing(docClient, {
           PK: `SUBJECT#${asg.subjectCode}`,
           SK: `ASSIGNMENT#${asg.assignmentId}`,
           GSI2PK: `ASSIGNMENT#${asg.assignmentId}`,
           GSI2SK: 'METADATA',
           entityType: 'ASSIGNMENT',
           ...asg
-        }
-      })
-    );
+        });
   }
   console.log(`[Seed] Seeded ${seedData.assignments.length} assignment records.`);
 
   // Submissions
   for (const sub of seedData.submissions) {
-    await docClient.send(
-      new PutCommand({
-        TableName: config.AWS.DYNAMODB_TABLE,
-        Item: {
+    await putSeedIfMissing(docClient, {
           PK: `SUBMISSION#${sub.submissionId}`,
           SK: 'METADATA',
           GSI3PK: `STUDENT#${sub.studentId}`,
@@ -196,23 +190,16 @@ async function setupDynamoDB() {
           GSI4SK: `STATUS#${sub.status}#${sub.submittedAt}`,
           entityType: 'SUBMISSION',
           ...sub
-        }
-      })
-    );
+        });
 
     // Revisions
     for (const rev of sub.revisions || []) {
-      await docClient.send(
-        new PutCommand({
-          TableName: config.AWS.DYNAMODB_TABLE,
-          Item: {
+      await putSeedIfMissing(docClient, {
             PK: `SUBMISSION#${sub.submissionId}`,
             SK: `REVISION#${rev.version}`,
             entityType: 'REVISION',
             ...rev
-          }
-        })
-      );
+          });
     }
   }
   console.log(`[Seed] Seeded ${seedData.submissions.length} submission records with revisions.`);

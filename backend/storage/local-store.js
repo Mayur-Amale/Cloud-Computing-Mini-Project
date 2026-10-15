@@ -107,7 +107,12 @@ class LocalStorageManager {
 
     if (existingIndex >= 0) {
       const existing = this.data.submissions[existingIndex];
-      const newVersion = sub.version || `v1.${(existing.revisions?.length || 1)}`;
+      const revisions = existing.revisions || [];
+      let newVersion = sub.version || `v1.${revisions.length}`;
+      if (revisions.some(revision => revision.version === newVersion)) {
+        const match = /^v(\d+)\.(\d+)$/.exec(newVersion);
+        newVersion = match ? `v${match[1]}.${Number(match[2]) + 1}` : `v1.${revisions.length}`;
+      }
       
       const revisionEntry = {
         version: newVersion,
@@ -124,7 +129,10 @@ class LocalStorageManager {
         version: newVersion,
         status: 'Pending Review',
         submittedAt: new Date().toISOString(),
-        revisions: [revisionEntry, ...(existing.revisions || [])]
+        revisions: [revisionEntry, ...revisions],
+        feedback: '',
+        reviewedBy: null,
+        reviewedAt: null
       };
 
       this.data.submissions[existingIndex] = updated;

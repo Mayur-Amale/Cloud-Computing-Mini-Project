@@ -6,9 +6,12 @@ const { authenticate } = require('../auth/middleware');
 
 // S3 Client configuration
 let s3Client = null;
-if (config.STORAGE_MODE === 'aws' && !config.AWS.S3_ENDPOINT) {
+if (config.STORAGE_MODE === 'aws') {
   try {
-    s3Client = new S3Client({ region: config.AWS.REGION });
+    s3Client = new S3Client({
+      region: config.AWS.REGION,
+      ...(config.AWS.S3_ENDPOINT ? { endpoint: config.AWS.S3_ENDPOINT, forcePathStyle: true } : {})
+    });
   } catch (err) {
     console.warn(`[S3] S3Client initialization warning:`, err.message);
   }
@@ -234,20 +237,20 @@ async function handleApiRequest(req, res, url) {
         return sendError(400, 'Bad Request: Missing assignmentId or fileName.');
       }
 
+      const assignment = await storage.getAssignment(body.assignmentId);
+      if (!assignment) return sendError(404, `Assignment ${body.assignmentId} not found.`);
+
       // Enforce student ownership: studentId must match authenticated user
       const studentId = user.userId;
       const studentName = user.name;
       const version = body.version || 'v1.0';
-
-      // Resolve subjectCode from assignment if not supplied
-      let subjectCode = body.subjectCode;
-      if (!subjectCode) {
-        const asg = await storage.getAssignment(body.assignmentId).catch(() => null);
-        subjectCode = asg ? asg.subjectCode : 'CS-601';
-      }
+      const subjectCode = assignment.subjectCode;
 
       // S3 object key follows structured secure naming convention
-      const s3Key = body.s3Key || `assignments/${subjectCode}/${body.assignmentId}/${studentId}/${version}/${body.fileName.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+      const expectedPrefix = `assignments/${subjectCode}/${body.assignmentId}/${studentId}/${version}/`;
+      const s3Key = body.s3Key && body.s3Key.startsWith(expectedPrefix)
+        ? body.s3Key
+        : `${expectedPrefix}${body.fileName.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
 
       const newSubmission = await storage.createSubmission({
         studentId,
@@ -323,33 +326,51 @@ async function handleApiRequest(req, res, url) {
       }
 
       const body = await readBody();
-      const { fileName, fileType, contentType, assignmentId, subjectCode: sc, version = 'v1.0' } = body;
+      const { fileName, fileType, contentType, assignmentId, version = 'v1.0' } = body;
+      const fileSizeBytes = Number(body.fileSizeBytes);
 
       if (!fileName || !assignmentId) {
         return sendError(400, 'Bad Request: Missing fileName or assignmentId.');
       }
+      if (!Number.isInteger(fileSizeBytes) || fileSizeBytes < 1 || fileSizeBytes > 25 * 1024 * 1024) {
+        return sendError(400, 'File must be between 1 byte and 25 MB.');
+      }
 
-      // Resolve subjectCode if not supplied
-      let subjectCode = sc;
-      if (!subjectCode) {
-        const asg = await storage.getAssignment(assignmentId).catch(() => null);
-        subjectCode = asg ? asg.subjectCode : 'CS-601';
+      const assignment = await storage.getAssignment(assignmentId);
+      if (!assignment) return sendError(404, `Assignment ${assignmentId} not found.`);
+      const subjectCode = assignment.subjectCode;
+
+      const existing = (await storage.listSubmissions({ studentId: user.userId }))
+        .find(submission => submission.assignmentId === assignmentId);
+      const usedVersions = existing?.revisions?.map(revision => revision.version) || [];
+      let effectiveVersion = version;
+      if (usedVersions.includes(effectiveVersion)) {
+        const match = /^v(\d+)\.(\d+)$/.exec(effectiveVersion);
+        effectiveVersion = match ? `v${match[1]}.${Number(match[2]) + 1}` : `v1.${usedVersions.length}`;
+        while (usedVersions.includes(effectiveVersion)) {
+          const next = /^v(\d+)\.(\d+)$/.exec(effectiveVersion);
+          effectiveVersion = next ? `v${next[1]}.${Number(next[2]) + 1}` : `v1.${usedVersions.length + 1}`;
+        }
       }
 
       const sanitizedFile = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
-      const s3Key = `assignments/${subjectCode}/${assignmentId}/${user.userId}/${version}/${sanitizedFile}`;
+      const s3Key = `assignments/${subjectCode}/${assignmentId}/${user.userId}/${effectiveVersion}/${sanitizedFile}`;
 
-      if (config.STORAGE_MODE === 'aws' && s3Client) {
+      if (config.STORAGE_MODE === 'aws' && !s3Client) {
+        return sendError(503, 'AWS S3 client is unavailable; local mock upload is disabled in AWS mode.');
+      }
+      if (config.STORAGE_MODE === 'aws') {
         // Real AWS S3 Pre-Signed PUT URL
         try {
           const command = new PutObjectCommand({
             Bucket: config.AWS.S3_BUCKET,
             Key: s3Key,
+            ContentLength: fileSizeBytes,
             ContentType: contentType || fileType || 'application/octet-stream',
             Metadata: {
               studentId: user.userId,
               assignmentId: assignmentId,
-              version: version
+              version: effectiveVersion
             }
           });
 
@@ -357,6 +378,7 @@ async function handleApiRequest(req, res, url) {
 
           return sendJson(200, {
             mode: 'aws',
+            version: effectiveVersion,
             uploadUrl: presignedUrl,
             method: 'PUT',
             headers: { 'Content-Type': contentType || fileType || 'application/octet-stream' },
@@ -365,13 +387,15 @@ async function handleApiRequest(req, res, url) {
             expiresInSeconds: 900
           });
         } catch (s3Err) {
-          console.warn(`[S3 PreSign] Real S3 signing failed, providing mock upload URL:`, s3Err.message);
+          console.error(`[S3 PreSign] AWS signing failed:`, s3Err.message);
+          return sendError(503, 'AWS S3 upload signing is unavailable. No mock upload was created.');
         }
       }
 
       // Local / Mock Mode Pre-Signed Response
       return sendJson(200, {
         mode: 'local-mock',
+        version: effectiveVersion,
         uploadUrl: `/api/uploads/mock-s3-upload?s3Key=${encodeURIComponent(s3Key)}`,
         method: 'PUT',
         headers: { 'Content-Type': 'application/octet-stream' },
@@ -405,7 +429,7 @@ async function handleApiRequest(req, res, url) {
     return sendError(404, `API route not found: ${method} ${pathname}`);
   } catch (err) {
     console.error(`[API Error] ${method} ${pathname}:`, err);
-    return sendError(500, `Internal Server Error: ${err.message}`);
+    return sendError(err.statusCode || 500, err.statusCode ? err.message : `Internal Server Error: ${err.message}`);
   }
 }
 

@@ -686,6 +686,7 @@
 
     let state = getStoredState();
     let backendSyncActive = false;
+    let backendStorageMode = "local";
 
     // Backend API Client with Role & User Identity Headers
     async function apiFetch(endpoint, options = {}) {
@@ -705,6 +706,43 @@
       return res.json();
     }
 
+    // Keep the API's persisted field names separate from the legacy Stitch view model.
+    function mapApiSubject(subject) {
+      return Object.assign({}, subject, {
+        id: subject.subjectCode,
+        code: subject.subjectCode,
+        instructor: subject.instructorName || subject.instructor || "Course Faculty"
+      });
+    }
+
+    function mapApiAssignment(assignment) {
+      const subject = state.subjects.find(s => (s.id || s.subjectCode) === assignment.subjectCode);
+      return Object.assign({}, assignment, {
+        id: assignment.assignmentId,
+        subjectId: assignment.subjectCode,
+        subjectName: subject?.name || assignment.subjectName || assignment.subjectCode
+      });
+    }
+
+    function mapApiSubmission(submission) {
+      const submittedAt = submission.submittedAt ? new Date(submission.submittedAt) : null;
+      const uploadTime = submittedAt && !Number.isNaN(submittedAt.getTime())
+        ? submittedAt.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })
+        : (submission.uploadTime || "Recently submitted");
+      return Object.assign({}, submission, {
+        id: submission.submissionId || submission.id,
+        studentRoll: submission.studentRoll || submission.studentId,
+        uploadTime,
+        score: submission.score ?? submission.scores?.total,
+        teacherFeedback: submission.teacherFeedback || submission.feedback || "",
+        revisionHistory: submission.revisionHistory || (submission.revisions || []).map(revision => ({
+          version: revision.version,
+          timestamp: revision.submittedAt || revision.timestamp,
+          notes: revision.comment || revision.notes || "Submission revision"
+        }))
+      });
+    }
+
     function updateBackendStorageIndicator(mode, online) {
       const badge = document.getElementById("backend-storage-badge");
       const label = document.getElementById("backend-storage-label");
@@ -721,7 +759,7 @@
         badge.className = "hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-medium border border-emerald-200";
         if (dot) dot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
       } else {
-        label.textContent = "DynamoDB (Local Mock DB)";
+        label.textContent = "Local Persistent DB";
         badge.className = "hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gold-50 text-gold-900 text-[11px] font-medium border border-gold-300";
         if (dot) dot.className = "w-2 h-2 rounded-full bg-gold-600 animate-pulse";
       }
@@ -732,24 +770,25 @@
       backendSyncActive = true;
       try {
         const health = await apiFetch("/api/health");
+        backendStorageMode = health.storageMode || "local";
         updateBackendStorageIndicator(health.storageMode, true);
 
         // Fetch subjects
         const subjects = await apiFetch("/api/subjects");
-        if (Array.isArray(subjects) && subjects.length > 0) {
-          state.subjects = subjects;
+        if (Array.isArray(subjects)) {
+          state.subjects = subjects.map(mapApiSubject);
         }
 
         // Fetch assignments
         const assignments = await apiFetch("/api/assignments");
-        if (Array.isArray(assignments) && assignments.length > 0) {
-          state.assignments = assignments;
+        if (Array.isArray(assignments)) {
+          state.assignments = assignments.map(mapApiAssignment);
         }
 
         // Fetch submissions (role-enforced by backend)
         const submissions = await apiFetch("/api/submissions");
         if (Array.isArray(submissions)) {
-          state.submissions = submissions;
+          state.submissions = submissions.map(mapApiSubmission);
         }
 
         saveState(state);
@@ -1847,6 +1886,10 @@
     }
 
     function processFile(file) {
+      if (!file || file.size === 0 || file.size > 25 * 1024 * 1024) {
+        showToast("Choose a file larger than 0 bytes and no bigger than 25 MB.", "warning");
+        return;
+      }
       selectedUploadFile = file;
       const dropzone = document.getElementById("dropzone");
       const card = document.getElementById("selected-file-card");
@@ -1896,6 +1939,9 @@
       }
 
       try {
+        if (backendStorageMode === "aws" && !selectedUploadFile) {
+          throw new Error("Choose the assignment file before uploading to AWS.");
+        }
         if (progressBar) progressBar.style.width = "25%";
         if (progressText) progressText.textContent = "Requesting S3 Pre-Signed Upload URL...";
 
@@ -1905,27 +1951,35 @@
           body: JSON.stringify({
             fileName: fileName,
             fileSize: fileSize,
+            fileSizeBytes: selectedUploadFile ? selectedUploadFile.size : Math.round(3.4 * 1024 * 1024),
             contentType: selectedUploadFile ? selectedUploadFile.type : "application/zip",
             assignmentId: assignmentId
           })
         });
 
         if (progressBar) progressBar.style.width = "60%";
-        if (progressText) progressText.textContent = "Uploading encrypted package to private S3 bucket...";
+        if (progressText) progressText.textContent = backendStorageMode === "aws"
+          ? "Uploading encrypted package to private S3 bucket..."
+          : "Sending file to the local upload simulator...";
 
         // 2. Upload file content to S3 (or mock S3 endpoint)
         const uploadPayload = selectedUploadFile || new Blob(["Student assignment binary data"], { type: "application/zip" });
-        await fetch(presign.uploadUrl, {
+        const uploadResponse = await fetch(presign.uploadUrl, {
           method: presign.method || "PUT",
           body: uploadPayload,
           headers: presign.headers || { "Content-Type": "application/octet-stream" }
         });
+        if (!uploadResponse.ok) {
+          throw new Error(`File upload failed (HTTP ${uploadResponse.status}). The submission was not recorded.`);
+        }
 
         if (progressBar) progressBar.style.width = "85%";
-        if (progressText) progressText.textContent = "Recording S3 key & metadata into DynamoDB...";
+        if (progressText) progressText.textContent = backendStorageMode === "aws"
+          ? "Recording S3 key and metadata in DynamoDB..."
+          : "Saving submission metadata in the local database...";
 
         // 3. Create submission record in database (only S3 key & metadata stored)
-        const createdSub = await apiFetch("/api/submissions", {
+        const createdSub = mapApiSubmission(await apiFetch("/api/submissions", {
           method: "POST",
           body: JSON.stringify({
             assignmentId: assignmentId,
@@ -1933,9 +1987,9 @@
             fileSize: fileSize,
             s3Key: presign.s3Key,
             comment: comment || "Student updated assignment files with test suite.",
-            version: version
+            version: presign.version || version
           })
-        });
+        }));
 
         if (progressBar) progressBar.style.width = "100%";
         if (progressText) progressText.textContent = "Upload verified & saved in persistent store!";
@@ -1945,7 +1999,9 @@
         activeStudentSubId = createdSub.id;
         saveState(state);
 
-        showToast("Submission successfully stored in DynamoDB & S3!", "success");
+        showToast(backendStorageMode === "aws"
+          ? "Submission metadata saved in DynamoDB and file uploaded to S3."
+          : "Submission saved in the local database; the mock upload did not retain the file.", "success");
         setTimeout(() => {
           window.location.hash = "#/student-submission";
         }, 500);
@@ -2703,14 +2759,14 @@ logging.basicConfig(level=logging.INFO)
 
       // Persist to backend (DynamoDB)
       try {
-        const updated = await apiFetch(`/api/submissions/${subId}/review`, {
+        const updated = mapApiSubmission(await apiFetch(`/api/submissions/${subId}/review`, {
           method: "PATCH",
           body: JSON.stringify({
             action: action,
             feedback: feedback,
             scores: { correctness: c, modularity: m, tests: t, docs: d }
           })
-        });
+        }));
 
         // Merge persisted record into local state
         const idx = state.submissions.findIndex(s => s.id === subId);
@@ -2718,9 +2774,9 @@ logging.basicConfig(level=logging.INFO)
         saveState(state);
 
         if (action === "revision") {
-          showToast(`Revision requested for ${sub.studentName} (${sub.studentRoll}) — saved to DynamoDB.`, "warning");
+          showToast(`Revision requested for ${sub.studentName} (${sub.studentRoll}) — saved to ${backendStorageMode === "aws" ? "DynamoDB" : "the local database"}.`, "warning");
         } else {
-          showToast(`Approved ${sub.studentName}'s submission (${totalScore}/100) — recorded in DynamoDB!`, "success");
+          showToast(`Approved ${sub.studentName}'s submission (${totalScore}/100) — recorded in ${backendStorageMode === "aws" ? "DynamoDB" : "the local database"}.`, "success");
         }
         updateShellHeader();
         renderCurrentView();
