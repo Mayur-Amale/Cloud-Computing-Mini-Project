@@ -1,53 +1,53 @@
 ---
 name: Student Drive
 colors:
-  surface: '#f8f9ff'
-  surface-dim: '#cbdbf5'
-  surface-bright: '#f8f9ff'
+  surface: '#fcf9f9'
+  surface-dim: '#e8dada'
+  surface-bright: '#ffffff'
   surface-container-lowest: '#ffffff'
-  surface-container-low: '#eff4ff'
-  surface-container: '#e5eeff'
-  surface-container-high: '#dce9ff'
-  surface-container-highest: '#d3e4fe'
-  on-surface: '#0b1c30'
-  on-surface-variant: '#434655'
-  inverse-surface: '#213145'
-  inverse-on-surface: '#eaf1ff'
-  outline: '#737686'
-  outline-variant: '#c3c6d7'
-  surface-tint: '#0053db'
-  primary: '#004ac6'
+  surface-container-low: '#faf3f4'
+  surface-container: '#f4ebec'
+  surface-container-high: '#eee2e3'
+  surface-container-highest: '#e6d7d9'
+  on-surface: '#1f1617'
+  on-surface-variant: '#544648'
+  inverse-surface: '#2d1a1d'
+  inverse-on-surface: '#faeef0'
+  outline: '#7d6e70'
+  outline-variant: '#cfc0c2'
+  surface-tint: '#800020'
+  primary: '#800020'
   on-primary: '#ffffff'
-  primary-container: '#2563eb'
-  on-primary-container: '#eeefff'
-  inverse-primary: '#b4c5ff'
-  secondary: '#565e74'
+  primary-container: '#941b31'
+  on-primary-container: '#fff0f2'
+  inverse-primary: '#f8c7d0'
+  secondary: '#5c5052'
   on-secondary: '#ffffff'
-  secondary-container: '#dae2fd'
-  on-secondary-container: '#5c647a'
-  tertiary: '#006058'
+  secondary-container: '#f4e8ea'
+  on-secondary-container: '#4a3e40'
+  tertiary: '#845e17'
   on-tertiary: '#ffffff'
-  tertiary-container: '#007b71'
-  on-tertiary-container: '#b3fff3'
+  tertiary-container: '#c59b27'
+  on-tertiary-container: '#291800'
   error: '#ba1a1a'
   on-error: '#ffffff'
   error-container: '#ffdad6'
   on-error-container: '#93000a'
-  primary-fixed: '#dbe1ff'
-  primary-fixed-dim: '#b4c5ff'
-  on-primary-fixed: '#00174b'
-  on-primary-fixed-variant: '#003ea8'
-  secondary-fixed: '#dae2fd'
-  secondary-fixed-dim: '#bec6e0'
-  on-secondary-fixed: '#131b2e'
-  on-secondary-fixed-variant: '#3f465c'
-  tertiary-fixed: '#89f5e7'
-  tertiary-fixed-dim: '#6bd8cb'
-  on-tertiary-fixed: '#00201d'
-  on-tertiary-fixed-variant: '#005049'
-  background: '#f8f9ff'
-  on-background: '#0b1c30'
-  surface-variant: '#d3e4fe'
+  primary-fixed: '#fce4e7'
+  primary-fixed-dim: '#f8c7d0'
+  on-primary-fixed: '#3d000d'
+  on-primary-fixed-variant: '#68051e'
+  secondary-fixed: '#f4e8ea'
+  secondary-fixed-dim: '#ddced0'
+  on-secondary-fixed: '#251d1e'
+  on-secondary-fixed-variant: '#43383a'
+  tertiary-fixed: '#fbf3db'
+  tertiary-fixed-dim: '#edd084'
+  on-tertiary-fixed: '#291800'
+  on-tertiary-fixed-variant: '#5a3e18'
+  background: '#fcf9f9'
+  on-background: '#1f1617'
+  surface-variant: '#ebdcdc'
 typography:
   display-lg:
     fontFamily: Inter
@@ -139,20 +139,20 @@ This design system establishes an authoritative, accessible, and structured digi
 The visual identity draws from **Corporate / Modern** principles rooted in administrative rigor and WCAG AAA accessibility. Surfaces rely on disciplined grid alignment, explicit 1px architectural borders, and deliberate contrast to minimize cognitive friction for students, faculty, and administrators navigating complex deadlines and review cycles.
 
 ### Personality & Tone
-- **Institutional & Trustworthy:** Anchored by deep slate and navy tones that convey stability, academic rigor, and structural authority.
-- **Utilitarian & Clear:** Action points and primary workflows are unmistakably highlighted using vivid institutional blue, preventing ambiguity in status tracking and submission flows.
-- **Calm & Focused:** Soft, balanced off-white canvases reduce visual fatigue during extended periods of grading, reading, and document revision.
+- **Institutional & Trustworthy:** Anchored by deep college maroon and warm slate tones that convey stability, academic rigor, and structural authority.
+- **Utilitarian & Clear:** Action points and primary workflows are unmistakably highlighted using vivid institutional maroon (`#800020`), supported by restrained gold accents (`#C59B27`), preventing ambiguity in status tracking and submission flows.
+- **Calm & Focused:** Soft, balanced warm off-white canvases (`#FCF9F9`) reduce visual fatigue during extended periods of grading, reading, and document revision.
 
 ## Colors
 
-The color architecture is built around high-contrast structural text, crisp institutional blue accents, and an unambiguous semantic status matrix. Every color role conforms strictly to accessibility requirements across standard data density displays.
+The color architecture is built around high-contrast structural text, deep institutional maroon accents, restrained college gold highlights, and an unambiguous semantic status matrix. Every color role conforms strictly to accessibility requirements across standard data density displays.
 
 ### Role Allocations
-- **Primary (`#2563EB`):** Applied exclusively to actionable elements—primary buttons, active tab indicators, selected states, and key interactive signifiers.
-- **Secondary (`#0F172A`):** The structural authority color. Used for headings, heavy navigation containers, dense table headers, and high-emphasis labels.
-- **Tertiary (`#0D9488`):** Applied to secondary indicators, verified credential badges, and complementary metric data.
-- **Neutral (`#64748B`):** Governs secondary body copy, passive borders, helper text, and inactive metadata.
-- **Canvas & Backgrounds:** The base app canvas rests on `#F8FAFC`, layered containers and cards use `#FFFFFF`, and resting row or input states leverage `#F1F5F9`.
+- **Primary (`#800020`):** Applied exclusively to actionable elements—primary buttons, active tab indicators, selected states, and key interactive signifiers.
+- **Secondary (`#5C5052`):** The structural authority color. Used for headings, heavy navigation containers, dense table headers, and high-emphasis labels.
+- **Tertiary (`#845E17` / Gold `#C59B27`):** Applied to secondary indicators, verified credential badges, and complementary metric data.
+- **Neutral (`#7D6E70`):** Governs secondary body copy, passive borders, helper text, and inactive metadata.
+- **Canvas & Backgrounds:** The base app canvas rests on `#FCF9F9`, layered containers and cards use `#FFFFFF`, and resting row or input states leverage `#FAF3F4`.
 
 ### Status & Academic Workflow Semantics
 - **Not Submitted / Inactive:** Background `#F1F5F9`, border `#CBD5E1`, text `#475569`.
@@ -204,31 +204,31 @@ The design uses a clean, controlled rounding system (`roundedness: 2`) that bala
 ## Components
 
 ### Buttons
-- **Primary:** Solid `#2563EB` fill, white text, 8px corner radius, padding `0.625rem 1.25rem`. Hover: `#1D4ED8`. Active: `#1E40AF`. Focus: Visible 2px outline offset with `rgba(37, 99, 235, 0.35)`.
-- **Secondary / Outline:** Background `#FFFFFF`, 1px solid `#CBD5E1`, text `#0F172A`. Hover: `#F8FAFC` and border `#94A3B8`.
+- **Primary:** Solid `#800020` fill, white text, 8px corner radius, padding `0.625rem 1.25rem`. Hover: `#660019`. Active: `#4d0013`. Focus: Visible 2px outline offset with `rgba(128, 0, 32, 0.35)`.
+- **Secondary / Outline:** Background `#FFFFFF`, 1px solid `#CBD5E1`, text `#1F1617`. Hover: `#FAF3F4` and border `#94A3B8`.
 - **Destructive:** Background `#FFE4E6`, 1px solid `#FECDD3`, text `#9F1239`. Hover: `#FEE2E2`.
 
 ### Status Badges (Pills)
 Pill-shaped (`rounded-full`), padding `0.25rem 0.75rem`, font `label-sm` with tabular numerals.
-- *Submitted / Reviewing:* `#FEF3C7` background, `#92400E` text, `#FDE68A` 1px border.
+- *Submitted / Reviewing:* `#FEF3C7` background, `#854D0E` text, `#FDE68A` 1px border.
 - *Changes Requested:* `#FFE4E6` background, `#9F1239` text, `#FECDD3` 1px border.
 - *Approved:* `#D1FAE5` background, `#065F46` text, `#A7F3D0` 1px border.
-- *Draft / Idle:* `#F1F5F9` background, `#475569` text, `#CBD5E1` 1px border.
+- *Draft / Idle:* `#F4E8EA` background, `#5C5052` text, `#CBD5E1` 1px border.
 
 ### Input Fields & Controls
-- **Inputs & Selects:** Height `2.5rem`, padding `0 0.75rem`, background `#FFFFFF`, border `1px solid #CBD5E1`, border-radius `0.5rem`. Focus: `#2563EB` border with `0 0 0 3px rgba(37, 99, 235, 0.15)`.
-- **Checkboxes & Radios:** Size `1rem`, border `1.5px solid #94A3B8`, checking fills with `#2563EB`.
+- **Inputs & Selects:** Height `2.5rem`, padding `0 0.75rem`, background `#FFFFFF`, border `1px solid #CBD5E1`, border-radius `0.5rem`. Focus: `#800020` border with `0 0 0 3px rgba(128, 0, 32, 0.15)`.
+- **Checkboxes & Radios:** Size `1rem`, border `1.5px solid #94A3B8`, checking fills with `#800020`.
 
 ### File Upload Dropzones
-- Dashed border (`2px dashed #CBD5E1`), background `#F8FAFC`, radius `0.5rem`, padding `2rem`.
-- Drag-hover transition shifts border to `#2563EB` and background to `rgba(37, 99, 235, 0.04)`.
-- Center alignment featuring an institutional blue upload icon, supported by primary text in `label-lg` and format/size restrictions in `body-sm` (`#64748B`).
+- Dashed border (`2px dashed #CBD5E1`), background `#FAF3F4`, radius `0.5rem`, padding `2rem`.
+- Drag-hover transition shifts border to `#800020` and background to `rgba(128, 0, 32, 0.04)`.
+- Center alignment featuring an institutional maroon upload icon, supported by primary text in `label-lg` and format/size restrictions in `body-sm` (`#7D6E70`).
 
 ### Data Tables & Lists
-- Table headers use `#F8FAFC` background with `1px solid #E2E8F0`, uppercase `label-xs` text (`#475569`), and explicit column dividers.
-- Alternating or hoverable table rows use `#FFFFFF` base transitioning to `#F1F5F9` on cursor hover. Borders strictly `1px solid #F1F5F9`.
+- Table headers use `#FAF3F4` background with `1px solid #E2E8F0`, uppercase `label-xs` text (`#5C5052`), and explicit column dividers.
+- Alternating or hoverable table rows use `#FFFFFF` base transitioning to `#FAF3F4` on cursor hover. Borders strictly `1px solid #FAF3F4`.
 
 ### Timeline & Version History
 - Vertical connected rail using a `2px solid #E2E8F0` track.
-- Version nodes rendered as 12px circles (`#FFFFFF` fill, `2px solid #2563EB`).
+- Version nodes rendered as 12px circles (`#FFFFFF` fill, `2px solid #800020`).
 - Content cards display submission author, file hash/name, timestamp (tabular numerals), and contextual change-log tags.

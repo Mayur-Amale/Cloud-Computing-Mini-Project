@@ -1,0 +1,17 @@
+{
+  "name": "student-drive-academic-portal",
+  "version": "1.0.0",
+  "description": "DYP DPU Student Drive: Academic assignment submission and faculty grading portal",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "student-drive",
+    "academic-portal",
+    "cloud-computing"
+  ],
+  "author": "DYP DPU CSE",
+  "license": "ISC"
+}

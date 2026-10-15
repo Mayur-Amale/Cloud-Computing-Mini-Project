@@ -1,0 +1,2589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Drive | Academic Portal - DYP DPU</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            // College Maroon Palette
+            maroon: {
+              DEFAULT: "#800020",
+              50: "#fdf2f4",
+              100: "#fbe4e8",
+              200: "#f8c7d0",
+              300: "#f39ab0",
+              400: "#ec6385",
+              500: "#de3662",
+              600: "#c71b48",
+              700: "#a61038",
+              800: "#800020",
+              900: "#68051e",
+              950: "#3d000d"
+            },
+            // College Gold Accent Palette
+            gold: {
+              DEFAULT: "#c59b27",
+              50: "#fdfaf0",
+              100: "#fbf3db",
+              200: "#f6e4b4",
+              300: "#edd084",
+              400: "#e2b852",
+              500: "#c59b27",
+              600: "#a77d1b",
+              700: "#845e17",
+              800: "#6d4b18",
+              900: "#5a3e18",
+              950: "#34210a"
+            },
+            // Stitch Semantic Tokens remapped to College Palette (Zero Blue)
+            primary: "#800020",
+            "on-primary": "#ffffff",
+            "primary-container": "#941b31",
+            "on-primary-container": "#fff0f2",
+            "primary-fixed": "#fce4e7",
+            "primary-fixed-dim": "#f8c7d0",
+            "on-primary-fixed": "#3d000d",
+            "on-primary-fixed-variant": "#68051e",
+            "inverse-primary": "#f8c7d0",
+            "surface-tint": "#800020",
+
+            secondary: "#5c5052",
+            "on-secondary": "#ffffff",
+            "secondary-container": "#f4e8ea",
+            "on-secondary-container": "#4a3e40",
+            "secondary-fixed": "#f4e8ea",
+            "secondary-fixed-dim": "#ddced0",
+            "on-secondary-fixed": "#251d1e",
+            "on-secondary-fixed-variant": "#43383a",
+
+            tertiary: "#845e17",
+            "on-tertiary": "#ffffff",
+            "tertiary-container": "#c59b27",
+            "on-tertiary-container": "#291800",
+            "tertiary-fixed": "#fbf3db",
+            "tertiary-fixed-dim": "#edd084",
+            "on-tertiary-fixed": "#291800",
+            "on-tertiary-fixed-variant": "#5a3e18",
+
+            surface: "#fcf9f9",
+            "on-surface": "#1f1617",
+            "surface-variant": "#ebdcdc",
+            "on-surface-variant": "#544648",
+            "surface-dim": "#e8dada",
+            "surface-bright": "#ffffff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#faf3f4",
+            "surface-container": "#f4ebec",
+            "surface-container-high": "#eee2e3",
+            "surface-container-highest": "#e6d7d9",
+
+            outline: "#7d6e70",
+            "outline-variant": "#cfc0c2",
+
+            background: "#fcf9f9",
+            "on-background": "#1f1617",
+
+            "inverse-surface": "#2d1a1d",
+            "inverse-on-surface": "#faeef0",
+
+            error: "#ba1a1a",
+            "on-error": "#ffffff",
+            "error-container": "#ffdad6",
+            "on-error-container": "#93000a"
+          },
+          borderRadius: {
+            DEFAULT: "0.25rem",
+            lg: "0.5rem",
+            xl: "0.75rem",
+            full: "9999px"
+          },
+          spacing: {
+            "space-md": "1rem",
+            "space-sm": "0.5rem",
+            "margin": "2rem",
+            "space-lg": "1.5rem",
+            "space-xl": "2rem",
+            "gutter-sm": "1rem",
+            "gutter": "1.5rem",
+            "margin-sm": "1rem",
+            "space-xs": "0.25rem"
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+            mono: ["JetBrains Mono", "monospace"],
+            "body-md": ["Inter", "sans-serif"],
+            "body-sm": ["Inter", "sans-serif"],
+            "headline-lg": ["Inter", "sans-serif"],
+            "label-lg": ["Inter", "sans-serif"],
+            "label-sm": ["Inter", "sans-serif"],
+            "body-lg": ["Inter", "sans-serif"],
+            "display-lg": ["Inter", "sans-serif"],
+            "label-md": ["Inter", "sans-serif"],
+            "headline-md": ["Inter", "sans-serif"],
+            "display-lg-mobile": ["Inter", "sans-serif"],
+            "headline-sm": ["Inter", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    @layer base {
+      html, body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', sans-serif;
+        color: #1f1617;
+        background-color: #fcf9f9;
+        -webkit-font-smoothing: antialiased;
+      }
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #f4ebec;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #cfc0c2;
+      border-radius: 9999px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+      background: #800020;
+    }
+    .badge-gold {
+      background-color: #fbf3db;
+      color: #6d4b18;
+      border: 1px solid #edd084;
+    }
+    .badge-maroon {
+      background-color: #fce4e7;
+      color: #800020;
+      border: 1px solid #f8c7d0;
+    }
+    .badge-approved {
+      background-color: #d1fae5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    .badge-revision {
+      background-color: #ffdad6;
+      color: #93000a;
+      border: 1px solid #ffb4ab;
+    }
+    .badge-idle {
+      background-color: #f4ebec;
+      color: #544648;
+      border: 1px solid #ebdcdc;
+    }
+  </style>
+</head>
+<body class="bg-background font-body-md text-on-background min-h-screen">
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-[9999] flex flex-col gap-2 max-w-sm pointer-events-none"></div>
+
+  <!-- APP SHELL CONTAINER -->
+  <div id="app-root">
+
+    <!-- DESKTOP SIDEBAR -->
+    <aside id="desktop-sidebar" class="hidden lg:flex fixed left-0 top-0 h-full w-64 bg-surface-container-lowest z-50 flex-col justify-between border-r border-surface-container-high shadow-sm">
+      <div class="flex flex-col">
+        <!-- Brand Header -->
+        <div class="h-16 flex items-center px- space-x-3 px-space-lg bg-surface-container-low border-b border-surface-container-high/70">
+          <img src="public/images/logo.png" alt="DYP DPU College Logo" class="h-10 w-10 object-contain p-1 rounded-md bg-white border border-surface-container-high shadow-xs"/>
+          <div class="flex flex-col min-w-0">
+            <span class="font-headline-sm text-sm font-bold text-on-surface tracking-tight leading-tight">Student Drive</span>
+            <span class="font-label-sm text-[11px] text-tertiary font-semibold flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-gold inline-block"></span>
+              DYP DPU Portal
+            </span>
+          </div>
+        </div>
+
+        <!-- Role Badge in Sidebar -->
+        <div class="mx-space-md mt-space-md p-2.5 rounded-lg bg-surface-container-low border border-surface-container-high/60 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div id="sidebar-role-avatar" class="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-on-primary text-xs font-semibold">
+              AC
+            </div>
+            <div class="flex flex-col">
+              <span id="sidebar-user-name" class="font-label-sm font-semibold text-on-surface text-xs leading-none">Alex Chen</span>
+              <span id="sidebar-user-role" class="text-[10px] text-secondary leading-tight mt-0.5">Student • CS-2026</span>
+            </div>
+          </div>
+          <button onclick="toggleActiveRole()" title="Quick Switch Role" class="text-[10px] font-semibold text-primary hover:text-maroon-700 bg-white border border-surface-container-high px-1.5 py-0.5 rounded shadow-2xs hover:bg-surface-container-low transition-colors">
+            Switch
+          </button>
+        </div>
+
+        <!-- Navigation Links -->
+        <div class="px-space-md pt-space-md custom-scroll overflow-y-auto max-h-[calc(100vh-250px)]">
+          <span class="font-label-sm text-[11px] text-secondary uppercase font-semibold px-space-sm mb-1.5 block tracking-wider">Student Workspace</span>
+          <nav class="flex flex-col gap-1" id="nav-student-links">
+            <a href="#/student-dashboard" data-path="student-dashboard" class="nav-item flex items-center gap-space-sm px-space-md py-2 rounded-lg font-label-md text-xs transition-colors">
+              <span class="material-symbols-outlined text-[19px]">grid_view</span>
+              <span>Student Dashboard</span>
+            </a>
+            <a href="#/subject-and-assignments" data-path="subject-and-assignments" class="nav-item flex items-center justify-between px-space-md py-2 rounded-lg font-label-md text-xs transition-colors">
+              <div class="flex items-center gap-space-sm">
+                <span class="material-symbols-outlined text-[19px]">menu_book</span>
+                <span>My Subjects</span>
+              </div>
+              <span class="px-1.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-[10px] font-semibold">5</span>
+            </a>
+            <a href="#/student-submission" data-path="student-submission" class="nav-item flex items-center justify-between px-space-md py-2 rounded-lg font-label-md text-xs transition-colors">
+              <div class="flex items-center gap-space-sm">
+                <span class="material-symbols-outlined text-[19px]">assignment_turned_in</span>
+                <span>My Submissions</span>
+              </div>
+              <span id="badge-submissions-count" class="px-1.5 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-[10px] font-semibold">2</span>
+            </a>
+            <a href="#/assignment-upload" data-path="assignment-upload" class="nav-item flex items-center gap-space-sm px-space-md py-2 rounded-lg font-label-md text-xs transition-colors">
+              <span class="material-symbols-outlined text-[19px]">upload_file</span>
+              <span>Upload Work</span>
+            </a>
+          </nav>
+
+          <div class="my-space-sm h-px bg-surface-container-high mx-space-sm"></div>
+
+          <span class="font-label-sm text-[11px] text-secondary uppercase font-semibold px-space-sm mb-1.5 block tracking-wider">Faculty Portal</span>
+          <nav class="flex flex-col gap-1" id="nav-faculty-links">
+            <a href="#/teacher-dashboard" data-path="teacher-dashboard" class="nav-item flex items-center justify-between px-space-md py-2 rounded-lg font-label-md text-xs transition-colors">
+              <div class="flex items-center gap-space-sm">
+                <span class="material-symbols-outlined text-[19px]">supervisor_account</span>
+                <span>Teacher Dashboard</span>
+              </div>
+              <span id="badge-teacher-queue" class="px-1.5 py-0.5 rounded-full badge-revision text-[10px] font-bold">12</span>
+            </a>
+            <a href="#/teacher-review" data-path="teacher-review" class="nav-item flex items-center gap-space-sm px-space-md py-2 rounded-lg font-label-md text-xs transition-colors">
+              <span class="material-symbols-outlined text-[19px]">fact_check</span>
+              <span>Grading Workspace</span>
+            </a>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Sidebar Footer -->
+      <div class="p-space-md flex flex-col gap-space-xs bg-surface-container-lowest border-t border-surface-container-high/70">
+        <a href="#/login" class="flex items-center gap-space-sm px-space-md py-2 rounded-lg text-error hover:bg-error-container hover:text-on-error-container transition-colors font-label-md text-xs font-medium">
+          <span class="material-symbols-outlined text-[18px]">logout</span>
+          <span>Sign Out / Switch Role</span>
+        </a>
+        <div class="mt-1 px-space-sm py-1 rounded bg-surface-container text-on-surface-variant flex items-center justify-between font-label-sm text-[11px]">
+          <span>AY 2024–2025</span>
+          <span class="font-bold text-primary">Sem 2 • Active</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MOBILE DRAWER & BACKDROP -->
+    <div id="mobile-drawer-backdrop" onclick="toggleMobileMenu()" class="fixed inset-0 bg-inverse-surface/50 backdrop-blur-xs z-50 hidden transition-opacity"></div>
+    <aside id="mobile-drawer" class="fixed left-0 top-0 bottom-0 w-72 bg-surface-container-lowest z-50 flex flex-col justify-between shadow-xl -translate-x-full transition-transform duration-300">
+      <div class="flex flex-col">
+        <div class="h-16 flex items-center justify-between px-space-md bg-surface-container-low border-b border-surface-container-high">
+          <div class="flex items-center gap-2">
+            <img src="public/images/logo.png" alt="Logo" class="h-8 w-8 object-contain bg-white rounded p-0.5 border border-surface-container-high"/>
+            <span class="font-bold text-sm text-primary">Student Drive</span>
+          </div>
+          <button onclick="toggleMobileMenu()" class="p-1 rounded text-on-surface-variant hover:bg-surface-container">
+            <span class="material-symbols-outlined text-xl">close</span>
+          </button>
+        </div>
+        <div class="p-space-md flex flex-col gap-1 overflow-y-auto" onclick="toggleMobileMenu()">
+          <span class="font-label-sm text-[11px] text-secondary uppercase font-semibold px-2 mb-1">Student Workspace</span>
+          <a href="#/student-dashboard" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs hover:bg-surface-container-high font-medium">
+            <span class="material-symbols-outlined text-[18px]">grid_view</span> Dashboard
+          </a>
+          <a href="#/subject-and-assignments" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs hover:bg-surface-container-high font-medium">
+            <span class="material-symbols-outlined text-[18px]">menu_book</span> My Subjects (5)
+          </a>
+          <a href="#/student-submission" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs hover:bg-surface-container-high font-medium">
+            <span class="material-symbols-outlined text-[18px]">assignment_turned_in</span> My Submissions
+          </a>
+          <a href="#/assignment-upload" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs hover:bg-surface-container-high font-medium">
+            <span class="material-symbols-outlined text-[18px]">upload_file</span> Upload Work
+          </a>
+          <div class="my-2 h-px bg-surface-container-high"></div>
+          <span class="font-label-sm text-[11px] text-secondary uppercase font-semibold px-2 mb-1">Faculty Access</span>
+          <a href="#/teacher-dashboard" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs hover:bg-surface-container-high font-medium">
+            <span class="material-symbols-outlined text-[18px]">supervisor_account</span> Teacher Dashboard
+          </a>
+          <a href="#/teacher-review" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs hover:bg-surface-container-high font-medium">
+            <span class="material-symbols-outlined text-[18px]">fact_check</span> Grading Workspace
+          </a>
+          <div class="my-2 h-px bg-surface-container-high"></div>
+          <a href="#/login" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-error font-medium">
+            <span class="material-symbols-outlined text-[18px]">logout</span> Sign out
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- TOP HEADER -->
+    <header id="app-header" class="fixed top-0 left-0 lg:left-64 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-md z-40 flex items-center justify-between px-4 lg:px-margin border-b border-surface-container-high shadow-xs transition-all">
+      <div class="flex items-center gap-3">
+        <!-- Mobile Menu Hamburger -->
+        <button onclick="toggleMobileMenu()" class="lg:hidden p-2 rounded-lg text-on-surface-variant hover:bg-surface-container flex items-center justify-center">
+          <span class="material-symbols-outlined text-[22px]">menu</span>
+        </button>
+        <!-- College Quick Search -->
+        <div class="flex items-center gap-space-sm bg-surface-container-low px-3 py-1.5 rounded-lg border border-surface-container-high text-xs">
+          <span class="material-symbols-outlined text-[18px] text-outline">search</span>
+          <input id="global-search-input" onkeyup="handleGlobalSearch(event)" class="bg-transparent text-on-surface placeholder:text-outline font-body-sm text-xs focus:outline-none w-36 sm:w-60" placeholder="Search courses, roll no, topics..." type="text"/>
+        </div>
+        <div class="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full badge-gold font-label-sm text-[11px]">
+          <span class="material-symbols-outlined text-[15px] text-tertiary">calendar_today</span>
+          <span>Fall Term • Week 9</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <!-- AWS Simulation Badge Indicator -->
+        <div class="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container text-secondary text-[11px] font-medium border border-surface-container-high" title="Frontend prototype with mock AWS S3 and Cognito flow">
+          <span class="w-2 h-2 rounded-full bg-gold animate-pulse"></span>
+          <span>Mock AWS Sandbox</span>
+        </div>
+
+        <!-- Notification Bell with Dropdown -->
+        <div class="relative">
+          <button onclick="toggleNotifications()" class="relative p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors flex items-center justify-center" aria-label="Notifications">
+            <span class="material-symbols-outlined text-[22px]">notifications</span>
+            <span id="unread-dot" class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary"></span>
+          </button>
+          <div id="notifications-panel" class="hidden absolute right-0 mt-2 w-80 bg-surface-container-lowest rounded-xl shadow-xl border border-surface-container-high p-3 z-50">
+            <div class="flex items-center justify-between pb-2 border-b border-surface-container-high">
+              <span class="font-semibold text-xs text-on-surface">Campus Activity Alerts</span>
+              <span class="text-[10px] text-secondary">2 New</span>
+            </div>
+            <div class="flex flex-col gap-2 mt-2">
+              <div class="p-2 rounded-lg bg-surface-container-low text-xs border border-surface-container-high">
+                <span class="font-semibold text-primary block">Revision Requested</span>
+                <span class="text-secondary text-[11px]">Dr. Evelyn Reed posted feedback on CS-601 Assignment 2.</span>
+              </div>
+              <div class="p-2 rounded-lg bg-surface-container-low text-xs border border-surface-container-high">
+                <span class="font-semibold text-tertiary block">New Assignment Published</span>
+                <span class="text-secondary text-[11px]">CS-601: Assignment 4 due Nov 8, 2024.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Role Pill Switcher & Avatar -->
+        <div class="flex items-center gap-2 pl-2 border-l border-surface-container-high">
+          <div class="flex flex-col text-right hidden sm:flex">
+            <span id="header-user-name" class="font-label-md text-xs font-semibold text-on-surface leading-tight">Alex Chen</span>
+            <span id="header-user-role" class="font-label-sm text-[10px] text-secondary leading-none">Student • CS-2023-084</span>
+          </div>
+          <button onclick="toggleActiveRole()" title="Click to Switch Role (Student / Teacher)" class="group flex items-center gap-1.5 p-1 rounded-full hover:ring-2 hover:ring-primary/30 transition-all">
+            <div id="header-avatar" class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-semibold text-xs shadow-xs">
+              AC
+            </div>
+            <span class="material-symbols-outlined text-[16px] text-outline group-hover:text-primary transition-colors">swap_horiz</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN VIEW CONTAINER -->
+    <main id="main-content-area" class="relative pt-16 lg:pl-64 min-h-screen bg-surface p-4 lg:p-margin">
+      <!-- DYNAMIC VIEWS WILL RENDER HERE -->
+      <div id="view-container"></div>
+    </main>
+
+  </div>
+
+  <!-- APPLICATION JAVASCRIPT & STATE MANAGEMENT -->
+  <script>
+    // ==========================================
+    // PORTAL STATE & SAMPLE DATA ARCHITECTURE
+    // ==========================================
+    const INITIAL_STATE = {
+      currentUser: {
+        role: "student", // "student" or "teacher"
+        student: {
+          id: "CS-2023-084",
+          name: "Alex Chen",
+          term: "Term 6 • B.Tech Computer Science & Engineering",
+          gpa: "3.84",
+          attendance: "94.2%",
+          credits: "92 / 120",
+          initials: "AC"
+        },
+        teacher: {
+          id: "FAC-CSE-042",
+          name: "Dr. Evelyn Reed",
+          title: "Associate Professor • Tenured",
+          department: "Dept. of Computer Science & Engineering",
+          officeHours: "Tue & Thu • 14:00 - 16:30 (Room 412B)",
+          activeCourses: 2,
+          enrolledStudents: 65,
+          initials: "ER"
+        }
+      },
+      currentView: "student-dashboard",
+      subjects: [
+        {
+          id: "CS-601",
+          name: "Computer Networks",
+          code: "CS-601",
+          credits: 4.0,
+          section: "02A",
+          instructor: "Dr. Evelyn Reed",
+          room: "Engineering Hall 304 • MWF 10:00–11:15 AM",
+          description: "Fundamental principles in packet switched internetworking, TCP/IP architecture, socket programming, flow control, interior routing protocols, and distributed packet inspection.",
+          status: "Active",
+          progress: 68,
+          pendingTasks: 2
+        },
+        {
+          id: "CS-602",
+          name: "Cloud Computing Architectures",
+          code: "CS-602",
+          credits: 3.5,
+          section: "01B",
+          instructor: "Prof. David Vance",
+          room: "Tech Center 202 • TTh 13:00–14:30 PM",
+          description: "Virtualization, distributed cloud primitives, AWS infrastructure simulation, serverless microservices, and storage tier optimization.",
+          status: "Active",
+          progress: 80,
+          pendingTasks: 1
+        },
+        {
+          id: "CS-603",
+          name: "Distributed Systems",
+          code: "CS-603",
+          credits: 4.0,
+          section: "02A",
+          instructor: "Dr. Evelyn Reed",
+          room: "Engineering Hall 102 • MW 14:00–15:30 PM",
+          description: "Consensus algorithms (Raft, Paxos), vector clocks, Byzantine fault tolerance, and distributed key-value storage designs.",
+          status: "Active",
+          progress: 75,
+          pendingTasks: 1
+        },
+        {
+          id: "CS-604",
+          name: "Database Engine Internals",
+          code: "CS-604",
+          credits: 3.0,
+          section: "01A",
+          instructor: "Prof. Ananya Sen",
+          room: "Seminar Hall 4B • Fri 09:00–12:00 PM",
+          description: "B-Tree indexing, write-ahead logging (WAL), buffer pool managers, and concurrency control protocols.",
+          status: "Active",
+          progress: 88,
+          pendingTasks: 0
+        },
+        {
+          id: "CS-605",
+          name: "Machine Learning & AI",
+          code: "CS-605",
+          credits: 4.0,
+          section: "03C",
+          instructor: "Dr. Rajesh Kothari",
+          room: "CS Lab 6 • MWF 11:30–12:45 PM",
+          description: "Statistical learning models, backpropagation, convolutional networks, and deep reinforcement learning.",
+          status: "Active",
+          progress: 92,
+          pendingTasks: 0
+        }
+      ],
+      assignments: [
+        {
+          id: "asg-3",
+          subjectId: "CS-601",
+          subjectCode: "CS-601",
+          subjectName: "Computer Networks",
+          title: "Assignment 3: TCP/UDP Socket Implementation",
+          dueDate: "Oct 24, 2024 • 11:59 PM EST",
+          hoursRemaining: 28,
+          maxScore: 100,
+          attempt: "1 of 3 Allowed",
+          status: "Due Soon",
+          brief: "Implement a multi-threaded client-server echo application in Python 3.10+ supporting both TCP stream socket with framing and UDP datagram packet reassembly. Include robust timeout handling, unit tests, and performance benchmark comparison.",
+          requirements: [
+            "Socket programming in Python or C++ (RFC 793 / RFC 768)",
+            "Concurrent handling of at least 20 client streams via threading or async io",
+            "Comprehensive error handling for broken pipes & socket timeouts",
+            "Markdown documentation with wireshark packet capture analysis"
+          ]
+        },
+        {
+          id: "asg-2",
+          subjectId: "CS-601",
+          subjectCode: "CS-601",
+          subjectName: "Computer Networks",
+          title: "Assignment 2: Distance Vector Routing Simulation",
+          dueDate: "Oct 25, 2024 • 11:59 PM EST",
+          hoursRemaining: 18,
+          maxScore: 100,
+          attempt: "2 of 3 Allowed",
+          status: "Needs Revision",
+          brief: "Simulate Bellman-Ford distance vector distributed convergence across a 6-node network graph with link-cost variations.",
+          teacherFeedback: "Alex, your distance vector calculation is correct for converging topologies, but line 142 fails to handle the count-to-infinity loop when node 4 goes offline. Please implement split horizon with poison reverse and resubmit before the deadline.",
+          revisionHistory: [
+            { version: "v1.1", timestamp: "Pending Submission", notes: "Implementing split horizon with poison reverse" },
+            { version: "v1.0", timestamp: "Oct 22, 2024 • 10:14 PM", notes: "Initial simulation script and topology graph" }
+          ],
+          rubricScores: {
+            correctness: 24, // /30
+            modularity: 20,  // /20
+            tests: 18,        // /25
+            docs: 15          // /15
+          }
+        },
+        {
+          id: "asg-1",
+          subjectId: "CS-601",
+          subjectCode: "CS-601",
+          subjectName: "Computer Networks",
+          title: "Assignment 1: HTTP/1.1 vs HTTP/2 Wireshark Packet Analysis",
+          dueDate: "Oct 10, 2024 • 11:59 PM EST",
+          hoursRemaining: 0,
+          maxScore: 100,
+          score: 96,
+          status: "Approved",
+          brief: "Comparative latency and header compression study using Wireshark captures.",
+          teacherFeedback: "Exemplary packet trace breakdown and multiplexing analysis. Full marks on TCP window analysis."
+        },
+        {
+          id: "asg-4",
+          subjectId: "CS-601",
+          subjectCode: "CS-601",
+          subjectName: "Computer Networks",
+          title: "Assignment 4: BGP Inter-Domain Routing Study",
+          dueDate: "Nov 08, 2024 • 11:59 PM EST",
+          hoursRemaining: 240,
+          maxScore: 100,
+          status: "Upcoming",
+          brief: "Autonomous Systems peering, path-vector attribute filtering, and loop prevention."
+        }
+      ],
+      submissions: [
+        {
+          id: "sub-101",
+          studentId: "CS-2023-084",
+          studentName: "Alex Chen",
+          studentRoll: "CS-2023-084",
+          assignmentId: "asg-3",
+          subjectCode: "CS-601",
+          title: "Assignment 3: TCP/UDP Socket Implementation",
+          version: "v1.0",
+          fileName: "alex_chen_cs2023084_asg3.zip",
+          fileSize: "3.4 MB",
+          uploadTime: "Oct 23, 2024 • 02:15 PM",
+          status: "Pending Review",
+          s3Key: "s3://student-drive-assignments-dyp-dpu/cs-601/cs-2023-084/asg3_v1.zip",
+          comment: "Complete TCP stream framing with thread pool executor and UDP benchmark script.",
+          scores: { correctness: 28, modularity: 19, tests: 23, docs: 15 },
+          feedback: ""
+        },
+        {
+          id: "sub-102",
+          studentId: "CS-2023-084",
+          studentName: "Alex Chen",
+          studentRoll: "CS-2023-084",
+          assignmentId: "asg-2",
+          subjectCode: "CS-601",
+          title: "Assignment 2: Distance Vector Routing Simulation",
+          version: "v1.1",
+          fileName: "alex_chen_cs2023084_asg2_revised.zip",
+          fileSize: "2.1 MB",
+          uploadTime: "Oct 24, 2024 • 10:30 AM",
+          status: "Needs Revision",
+          s3Key: "s3://student-drive-assignments-dyp-dpu/cs-601/cs-2023-084/asg2_v1.1.zip",
+          comment: "Updated routing loop suppression using split horizon and poisoned reverse flags.",
+          scores: { correctness: 24, modularity: 20, tests: 18, docs: 15 },
+          feedback: "Alex, your distance vector calculation is correct for converging topologies, but line 142 fails to handle the count-to-infinity problem. Please implement split horizon with poison reverse and resubmit."
+        },
+        {
+          id: "sub-103",
+          studentId: "CS-2023-019",
+          studentName: "Priya Sharma",
+          studentRoll: "CS-2023-019",
+          assignmentId: "asg-raft",
+          subjectCode: "CS-603",
+          title: "Distributed Consensus Raft Implementation",
+          version: "v1.0",
+          fileName: "priya_sharma_raft_v1.zip",
+          fileSize: "4.8 MB",
+          uploadTime: "Oct 23, 2024 • 08:45 PM",
+          status: "Pending Review",
+          s3Key: "s3://student-drive-assignments-dyp-dpu/cs-603/cs-2023-019/raft.zip",
+          comment: "Implemented leader election, log replication heartbeat, and unit test suite.",
+          scores: { correctness: 27, modularity: 18, tests: 22, docs: 14 },
+          feedback: ""
+        },
+        {
+          id: "sub-104",
+          studentId: "CS-2023-056",
+          studentName: "Rahul Patil",
+          studentRoll: "CS-2023-056",
+          assignmentId: "asg-cloud",
+          subjectCode: "CS-602",
+          title: "Cloud Virtualization Mini-Lab",
+          version: "v1.0",
+          fileName: "rahul_patil_lab3.pdf",
+          fileSize: "1.9 MB",
+          uploadTime: "Oct 22, 2024 • 11:20 PM",
+          status: "Pending Review",
+          s3Key: "s3://student-drive-assignments-dyp-dpu/cs-602/cs-2023-056/lab3.pdf",
+          comment: "KVM hypervisor benchmarks and Docker container memory isolation graphs.",
+          scores: { correctness: 26, modularity: 19, tests: 20, docs: 14 },
+          feedback: ""
+        },
+        {
+          id: "sub-105",
+          studentId: "CS-2023-112",
+          studentName: "Sarah Jenkins",
+          studentRoll: "CS-2023-112",
+          assignmentId: "asg-3",
+          subjectCode: "CS-601",
+          title: "Assignment 3: TCP/UDP Socket Implementation",
+          version: "v1.0",
+          fileName: "sarah_jenkins_asg3.tar.gz",
+          fileSize: "3.1 MB",
+          uploadTime: "Oct 21, 2024 • 04:10 PM",
+          status: "Approved",
+          s3Key: "s3://student-drive-assignments-dyp-dpu/cs-601/cs-2023-112/asg3.tar.gz",
+          comment: "Full asyncio server with TLS handshake demo.",
+          scores: { correctness: 29, modularity: 20, tests: 24, docs: 15 },
+          feedback: "Exceptional socket code clarity and asynchronous stress test harness. Approved 98/100."
+        }
+      ]
+    };
+
+    // State persistence helper
+    function getStoredState() {
+      try {
+        const stored = localStorage.getItem("dyp_student_drive_state");
+        if (stored) return JSON.parse(stored);
+      } catch (e) {
+        console.warn("Storage parse error, fallback to initial state:", e);
+      }
+      return INITIAL_STATE;
+    }
+
+    function saveState(state) {
+      try {
+        localStorage.setItem("dyp_student_drive_state", JSON.stringify(state));
+      } catch (e) {
+        console.warn("Failed to persist state:", e);
+      }
+    }
+
+    let state = getStoredState();
+
+    // Show Toast Notification
+    function showToast(message, type = "success") {
+      const container = document.getElementById("toast-container");
+      const toast = document.createElement("div");
+      toast.className = `p-3 rounded-lg shadow-xl text-xs font-semibold flex items-center gap-2 border pointer-events-auto transition-all duration-300 transform translate-y-2 opacity-0 ${
+        type === "success"
+          ? "bg-maroon-800 text-white border-gold/40 shadow-maroon-900/30"
+          : type === "warning"
+          ? "bg-amber-100 text-amber-900 border-amber-300"
+          : "bg-surface-container-lowest text-on-surface border-surface-container-high"
+      }`;
+
+      const icon = type === "success" ? "check_circle" : type === "warning" ? "warning" : "info";
+      toast.innerHTML = `
+        <span class="material-symbols-outlined text-[18px] ${type === 'success' ? 'text-gold' : ''}">${icon}</span>
+        <span>${message}</span>
+      `;
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove("translate-y-2", "opacity-0");
+      });
+
+      setTimeout(() => {
+        toast.classList.add("opacity-0", "translate-y-2");
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // Role Toggling between Student and Teacher
+    function toggleActiveRole() {
+      if (state.currentUser.role === "student") {
+        state.currentUser.role = "teacher";
+        state.currentView = "teacher-dashboard";
+        window.location.hash = "#/teacher-dashboard";
+        showToast("Switched to Faculty Portal: Dr. Evelyn Reed", "success");
+      } else {
+        state.currentUser.role = "student";
+        state.currentView = "student-dashboard";
+        window.location.hash = "#/student-dashboard";
+        showToast("Switched to Student Portal: Alex Chen", "success");
+      }
+      saveState(state);
+      updateShellHeader();
+      renderCurrentView();
+    }
+
+    function setRole(role) {
+      state.currentUser.role = role;
+      saveState(state);
+      updateShellHeader();
+    }
+
+    // Header & Shell Dynamic Updates
+    function updateShellHeader() {
+      const isStudent = state.currentUser.role === "student";
+      const u = isStudent ? state.currentUser.student : state.currentUser.teacher;
+
+      // Update sidebar
+      const sideName = document.getElementById("sidebar-user-name");
+      const sideRole = document.getElementById("sidebar-user-role");
+      const sideAv = document.getElementById("sidebar-role-avatar");
+      if (sideName) sideName.textContent = u.name;
+      if (sideRole) sideRole.textContent = isStudent ? `Student • ${u.id}` : `Faculty • ${u.id}`;
+      if (sideAv) {
+        sideAv.textContent = u.initials;
+        sideAv.className = `w-7 h-7 rounded-full flex items-center justify-center text-on-primary text-xs font-semibold ${isStudent ? 'bg-primary' : 'bg-gold-700'}`;
+      }
+
+      // Update header
+      const headName = document.getElementById("header-user-name");
+      const headRole = document.getElementById("header-user-role");
+      const headAv = document.getElementById("header-avatar");
+      if (headName) headName.textContent = u.name;
+      if (headRole) headRole.textContent = isStudent ? `Student • ${u.id}` : u.department;
+      if (headAv) {
+        headAv.textContent = u.initials;
+        headAv.className = `w-8 h-8 rounded-full flex items-center justify-center text-on-primary font-semibold text-xs shadow-xs ${isStudent ? 'bg-primary' : 'bg-gold-700'}`;
+      }
+
+      // Active Navigation Link Styling
+      document.querySelectorAll(".nav-item").forEach(item => {
+        const itemPath = item.getAttribute("data-path");
+        if (itemPath === state.currentView) {
+          item.className = "nav-item flex items-center gap-space-sm px-space-md py-2 rounded-lg font-label-md text-xs transition-colors bg-primary-container text-on-primary-container font-semibold shadow-xs";
+        } else {
+          item.className = "nav-item flex items-center gap-space-sm px-space-md py-2 rounded-lg font-label-md text-xs transition-colors text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface";
+        }
+      });
+
+      // Update pending counts in badges
+      const pendingReviewCount = state.submissions.filter(s => s.status === "Pending Review" || s.status === "Needs Revision").length;
+      const teacherQueueBadge = document.getElementById("badge-teacher-queue");
+      if (teacherQueueBadge) teacherQueueBadge.textContent = pendingReviewCount;
+    }
+
+    // Toggle Notification Panel
+    function toggleNotifications() {
+      const p = document.getElementById("notifications-panel");
+      if (p) p.classList.toggle("hidden");
+    }
+
+    // Toggle Mobile Navigation Drawer
+    function toggleMobileMenu() {
+      const drawer = document.getElementById("mobile-drawer");
+      const backdrop = document.getElementById("mobile-drawer-backdrop");
+      if (drawer && backdrop) {
+        const isOpen = !drawer.classList.contains("-translate-x-full");
+        if (isOpen) {
+          drawer.classList.add("-translate-x-full");
+          backdrop.classList.add("hidden");
+        } else {
+          drawer.classList.remove("-translate-x-full");
+          backdrop.classList.remove("hidden");
+        }
+      }
+    }
+
+    // Global Search Bar Handler
+    function handleGlobalSearch(e) {
+      if (e.key === "Enter") {
+        const term = e.target.value.trim().toLowerCase();
+        if (!term) return;
+        if (term.includes("net") || term.includes("cs-601") || term.includes("evelyn")) {
+          window.location.hash = "#/subject-and-assignments";
+        } else if (term.includes("upload") || term.includes("socket")) {
+          window.location.hash = "#/assignment-upload";
+        } else if (term.includes("grade") || term.includes("review") || term.includes("teacher")) {
+          window.location.hash = "#/teacher-dashboard";
+        } else {
+          showToast(`Search for "${term}" returned 3 matching academic files.`, "info");
+        }
+      }
+    }
+
+    // ==========================================
+    // CLIENT-SIDE ROUTER & SCREEN RENDERERS
+    // ==========================================
+    function handleRouting() {
+      const hash = window.location.hash.replace("#/", "") || "student-dashboard";
+      state.currentView = hash;
+      
+      // Control Sidebar & Header visibility for Login screen
+      const sidebar = document.getElementById("desktop-sidebar");
+      const header = document.getElementById("app-header");
+      const mainArea = document.getElementById("main-content-area");
+
+      if (hash === "login") {
+        if (sidebar) sidebar.classList.add("hidden");
+        if (header) header.classList.add("hidden");
+        if (mainArea) {
+          mainArea.classList.remove("lg:pl-64", "pt-16");
+          mainArea.classList.add("p-0");
+        }
+      } else {
+        if (sidebar) sidebar.classList.remove("hidden");
+        if (header) header.classList.remove("hidden");
+        if (mainArea) {
+          mainArea.classList.add("lg:pl-64", "pt-16");
+          mainArea.classList.remove("p-0");
+        }
+      }
+
+      updateShellHeader();
+      renderCurrentView();
+      window.scrollTo(0, 0);
+    }
+
+    window.addEventListener("hashchange", handleRouting);
+    window.addEventListener("DOMContentLoaded", handleRouting);
+
+    function renderCurrentView() {
+      const container = document.getElementById("view-container");
+      if (!container) return;
+
+      switch (state.currentView) {
+        case "login":
+          container.innerHTML = renderLoginScreen();
+          initLoginScripts();
+          break;
+        case "student-dashboard":
+          container.innerHTML = renderStudentDashboard();
+          break;
+        case "subject-and-assignments":
+          container.innerHTML = renderSubjectPage();
+          break;
+        case "assignment-upload":
+          container.innerHTML = renderAssignmentUploadPage();
+          initUploadScripts();
+          break;
+        case "student-submission":
+          container.innerHTML = renderStudentSubmissionDetails();
+          break;
+        case "teacher-dashboard":
+          container.innerHTML = renderTeacherDashboard();
+          break;
+        case "teacher-review":
+          container.innerHTML = renderTeacherReviewPage();
+          break;
+        default:
+          container.innerHTML = renderStudentDashboard();
+      }
+    }
+
+    // =========================================================================
+    // 1. LOGIN SCREEN (Maroon / White / Gold Theme with Local Assets)
+    // =========================================================================
+    function renderLoginScreen() {
+      return `
+        <div class="min-h-screen w-full flex items-center justify-center p-4 sm:p-gutter bg-surface">
+          <div class="relative w-full max-w-5xl">
+            <!-- Subtle College Glow Elements -->
+            <div class="absolute -top-12 -left-12 w-96 h-96 bg-primary-fixed/30 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-16 -right-16 w-80 h-80 bg-gold-200/30 rounded-full blur-3xl pointer-events-none"></div>
+
+            <!-- Main Authentication Split Card -->
+            <div class="relative w-full bg-surface-container-lowest rounded-xl shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[660px] border border-surface-container-high">
+              
+              <!-- Left Column: College Context with Local Campus Photograph -->
+              <div class="lg:col-span-5 relative bg-[#36040c] text-inverse-on-surface flex flex-col justify-between p-8 sm:p-10 overflow-hidden">
+                <!-- Local Image Asset Background -->
+                <div class="absolute inset-0 z-0 opacity-20 mix-blend-luminosity bg-cover bg-center" style="background-image: url('public/images/image-1.jpg')"></div>
+                <!-- Maroon Scrim for High-Contrast Institutional Legibility -->
+                <div class="absolute inset-0 bg-gradient-to-b from-[#36040c]/95 via-[#540816]/85 to-[#240207] z-0 pointer-events-none"></div>
+
+                <!-- Top Header & Brand -->
+                <div class="relative z-10 flex flex-col gap-6">
+                  <div class="flex items-center gap-3">
+                    <img src="public/images/logo.png" alt="DYP DPU Logo" class="h-12 w-12 object-contain bg-white rounded-lg p-1 shadow-md shadow-maroon-950/40"/>
+                    <div class="flex flex-col">
+                      <span class="font-headline-sm text-lg text-white font-bold tracking-tight">Student Drive</span>
+                      <div class="flex items-center gap-2 mt-0.5">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-gold-500/25 text-gold-200 border border-gold-400/30 text-[10px] font-bold uppercase tracking-wider">
+                          DYP DPU Academic Node
+                        </span>
+                        <span class="w-1 h-1 rounded-full bg-white/40"></span>
+                        <span class="text-white/80 font-body-sm text-xs">CSE-2025</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mt-6 flex flex-col gap-2.5">
+                    <h1 class="font-display-lg text-2xl sm:text-3xl font-bold text-white tracking-tight leading-snug">
+                      Centralized Thesis & Project Repository
+                    </h1>
+                    <p class="text-white/80 font-body-md text-xs sm:text-sm leading-relaxed">
+                      Official defense scheduling, milestone submission, and faculty peer evaluation node for Department of Computer Science & Engineering.
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Live Academic Metric Card -->
+                <div class="relative z-10 my-6 bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/15 flex flex-col gap-2.5">
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="flex items-center gap-1.5 text-white font-semibold">
+                      <span class="material-symbols-outlined text-base text-gold-300">verified</span>
+                      Term Defense Cycle IV
+                    </span>
+                    <span class="px-2 py-0.5 rounded badge-gold text-[10px] font-bold">Stage 2 Active</span>
+                  </div>
+                  <div class="w-full bg-white/20 rounded-full h-2 overflow-hidden">
+                    <div class="bg-gold h-full rounded-full transition-all duration-500" style="width: 78%"></div>
+                  </div>
+                  <div class="flex items-center justify-between text-[11px] text-white/80 pt-0.5">
+                    <span>Synchronized with Central Campus EduServer</span>
+                    <span class="font-semibold text-white">78% Submitted</span>
+                  </div>
+                </div>
+
+                <!-- Footer Signature -->
+                <div class="relative z-10 flex items-center justify-between pt-3 border-t border-white/10 text-[11px] text-white/70">
+                  <div class="flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-sm">domain</span>
+                    <span>Faculty of Engineering & Technology</span>
+                  </div>
+                  <span class="font-mono text-[10px] tracking-widest uppercase">SECURE 443</span>
+                </div>
+              </div>
+
+              <!-- Right Column: Interactive Role Switcher & Sign In Form -->
+              <div class="lg:col-span-7 bg-surface-container-lowest p-8 lg:p-12 flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between mb-6">
+                    <div>
+                      <h2 class="font-headline-lg text-xl sm:text-2xl font-bold text-on-surface">Sign in to your account</h2>
+                      <p class="font-body-sm text-xs text-on-surface-variant mt-1">Authenticate with university credentials to access submission records.</p>
+                    </div>
+                    <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full badge-gold text-[10px] font-bold">
+                      <span class="w-2 h-2 rounded-full bg-gold animate-pulse"></span>
+                      <span>2FA Enforced</span>
+                    </div>
+                  </div>
+
+                  <!-- Segmented Role Switcher Tabs -->
+                  <div class="relative flex p-1 rounded-lg bg-surface-container-low mb-6 border border-surface-container-high" role="tablist">
+                    <button id="tab-student-btn" onclick="selectLoginTab('student')" class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md font-semibold text-xs transition-all shadow-xs bg-white text-primary">
+                      <span class="material-symbols-outlined text-base">badge</span>
+                      <span>Student</span>
+                    </button>
+                    <button id="tab-teacher-btn" onclick="selectLoginTab('teacher')" class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md font-semibold text-xs transition-all text-on-surface-variant hover:text-on-surface">
+                      <span class="material-symbols-outlined text-base">supervised_user_circle</span>
+                      <span>Faculty / Teacher</span>
+                    </button>
+                  </div>
+
+                  <!-- Quick Demo One-Click Fill -->
+                  <div class="mb-5 p-3 rounded-lg bg-gold-50/80 border border-gold-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div class="flex items-center gap-2 text-xs text-gold-900">
+                      <span class="material-symbols-outlined text-gold-700 text-lg">bolt</span>
+                      <span>Quick Demo Credentials:</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <button type="button" onclick="quickFillLogin('student')" class="px-2 py-1 bg-white hover:bg-gold-100 text-primary border border-gold-300 rounded text-[11px] font-bold shadow-2xs transition-colors">
+                        Alex Chen (Student)
+                      </button>
+                      <button type="button" onclick="quickFillLogin('teacher')" class="px-2 py-1 bg-white hover:bg-gold-100 text-gold-800 border border-gold-300 rounded text-[11px] font-bold shadow-2xs transition-colors">
+                        Dr. Evelyn Reed (Teacher)
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Authentication Form -->
+                  <form id="login-form" onsubmit="handleLoginFormSubmit(event)" class="flex flex-col gap-4">
+                    <div class="flex flex-col gap-1">
+                      <label id="login-id-label" for="login-id" class="font-label-md text-xs font-semibold text-on-surface">
+                        Roll Number / Student ID
+                      </label>
+                      <div class="relative flex items-center">
+                        <span class="material-symbols-outlined absolute left-3 text-outline text-[18px]">person</span>
+                        <input id="login-id" type="text" value="CS-2023-084" required class="w-full pl-9 pr-3 py-2 bg-surface-container-lowest border border-surface-container-high rounded-lg text-xs text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"/>
+                      </div>
+                    </div>
+
+                    <div class="flex flex-col gap-1">
+                      <div class="flex items-center justify-between">
+                        <label for="login-password" class="font-label-md text-xs font-semibold text-on-surface">Password</label>
+                        <a href="javascript:void(0)" onclick="showToast('Password reset link sent to registered college email.', 'info')" class="text-[11px] text-primary hover:underline">Forgot password?</a>
+                      </div>
+                      <div class="relative flex items-center">
+                        <span class="material-symbols-outlined absolute left-3 text-outline text-[18px]">lock</span>
+                        <input id="login-password" type="password" value="••••••••••••" required class="w-full pl-9 pr-3 py-2 bg-surface-container-lowest border border-surface-container-high rounded-lg text-xs text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"/>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center justify-between text-xs text-secondary mt-1">
+                      <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" checked class="rounded border-outline-variant text-primary focus:ring-primary h-3.5 w-3.5"/>
+                        <span>Remember device for 30 days</span>
+                      </label>
+                      <span class="text-[11px] text-tertiary flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">shield</span>
+                        DYP Secure SSO
+                      </span>
+                    </div>
+
+                    <button type="submit" class="mt-2 w-full py-2.5 px-4 bg-primary hover:bg-maroon-700 active:bg-maroon-900 text-on-primary font-semibold text-xs rounded-lg shadow-sm transition-all flex items-center justify-center gap-2">
+                      <span class="material-symbols-outlined text-base">login</span>
+                      <span id="login-btn-text">Sign in to Student Drive</span>
+                    </button>
+                  </form>
+                </div>
+
+                <!-- Disclaimer Notice -->
+                <div class="pt-6 border-t border-surface-container-high text-[11px] text-secondary flex items-start gap-2">
+                  <span class="material-symbols-outlined text-base text-gold shrink-0 mt-0.5">info</span>
+                  <p>
+                    <strong>Mock Sandbox Active:</strong> Authentication is simulated locally for presentation. Real deployment connects to AWS Cognito User Pool with JWT token validation.
+                  </p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    let activeLoginTab = "student";
+
+    function selectLoginTab(tab) {
+      activeLoginTab = tab;
+      const studentBtn = document.getElementById("tab-student-btn");
+      const teacherBtn = document.getElementById("tab-teacher-btn");
+      const label = document.getElementById("login-id-label");
+      const input = document.getElementById("login-id");
+      const btnText = document.getElementById("login-btn-text");
+
+      if (tab === "student") {
+        if (studentBtn) studentBtn.className = "flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md font-semibold text-xs transition-all shadow-xs bg-white text-primary";
+        if (teacherBtn) teacherBtn.className = "flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md font-semibold text-xs transition-all text-on-surface-variant hover:text-on-surface";
+        if (label) label.textContent = "Roll Number / Student ID";
+        if (input) input.value = "CS-2023-084";
+        if (btnText) btnText.textContent = "Sign in to Student Drive";
+      } else {
+        if (teacherBtn) teacherBtn.className = "flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md font-semibold text-xs transition-all shadow-xs bg-white text-primary";
+        if (studentBtn) studentBtn.className = "flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md font-semibold text-xs transition-all text-on-surface-variant hover:text-on-surface";
+        if (label) label.textContent = "Faculty ID / University Email";
+        if (input) input.value = "FAC-CSE-042";
+        if (btnText) btnText.textContent = "Sign in to Faculty Portal";
+      }
+    }
+
+    function quickFillLogin(role) {
+      selectLoginTab(role);
+      const input = document.getElementById("login-id");
+      if (role === "student") {
+        if (input) input.value = "CS-2023-084";
+      } else {
+        if (input) input.value = "FAC-CSE-042";
+      }
+      showToast(`Selected ${role === 'student' ? 'Alex Chen (Student)' : 'Dr. Evelyn Reed (Teacher)'}`, "info");
+    }
+
+    function handleLoginFormSubmit(e) {
+      e.preventDefault();
+      const isTeacher = activeLoginTab === "teacher";
+      state.currentUser.role = isTeacher ? "teacher" : "student";
+      saveState(state);
+      showToast(`Welcome back, ${isTeacher ? 'Dr. Evelyn Reed' : 'Alex Chen'}!`, "success");
+      window.location.hash = isTeacher ? "#/teacher-dashboard" : "#/student-dashboard";
+    }
+
+    function initLoginScripts() {
+      selectLoginTab(state.currentUser.role);
+    }
+
+    // =========================================================================
+    // 2. STUDENT DASHBOARD SCREEN (Stitch Layout with College Palette)
+    // =========================================================================
+    function renderStudentDashboard() {
+      const u = state.currentUser.student;
+      const dueSoonCount = state.assignments.filter(a => a.status === "Due Soon").length;
+      const submittedCount = 14;
+      const actionNeeded = state.assignments.filter(a => a.status === "Needs Revision").length;
+
+      return `
+        <div class="flex flex-col w-full gap-space-lg">
+          
+          <!-- Welcome Bar & Academic Credentials Header -->
+          <div class="relative bg-surface-container-lowest p-space-lg rounded-xl border border-surface-container-high shadow-xs overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+            <div class="absolute -right-10 -bottom-10 w-48 h-48 rounded-full bg-primary/5 pointer-events-none blur-2xl"></div>
+            
+            <div class="flex flex-col gap-1 z-10">
+              <div class="flex items-center gap-space-sm flex-wrap">
+                <h1 class="font-display-lg text-2xl font-bold text-on-surface">Good morning, ${u.name} 👋</h1>
+                <span class="px-space-sm py-0.5 rounded-full badge-maroon font-label-sm text-xs font-semibold">
+                  AY 2024–2025 • Sem 2
+                </span>
+              </div>
+              <div class="flex items-center gap-space-md text-on-surface-variant font-body-sm text-xs flex-wrap mt-1">
+                <span class="flex items-center gap-1 font-label-md font-semibold text-primary">
+                  <span class="material-symbols-outlined text-[16px]">badge</span>
+                  Roll No: ${u.id}
+                </span>
+                <span class="text-outline-variant">•</span>
+                <span class="flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[16px]">school</span>
+                  ${u.term}
+                </span>
+                <span class="text-outline-variant">•</span>
+                <span class="flex items-center gap-1 text-tertiary font-label-md font-semibold">
+                  <span class="material-symbols-outlined text-[16px]">verified</span>
+                  Good Standing (GPA ${u.gpa})
+                </span>
+              </div>
+            </div>
+
+            <!-- Quick Stat Pill Group -->
+            <div class="flex items-center gap-space-sm z-10 self-start md:self-auto bg-surface-container-low px-4 py-2 rounded-lg border border-surface-container-high">
+              <div class="flex flex-col text-right pr-3 border-r border-surface-container-high">
+                <span class="font-label-sm text-[10px] text-secondary uppercase tracking-wider font-semibold">Attendance</span>
+                <span class="font-headline-sm text-sm font-bold text-on-surface">${u.attendance}</span>
+              </div>
+              <div class="flex flex-col text-right pl-2">
+                <span class="font-label-sm text-[10px] text-secondary uppercase tracking-wider font-semibold">Credits Earned</span>
+                <span class="font-headline-sm text-sm font-bold text-primary">${u.credits}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Key Metrics Row (3-Column Desktop Grid) -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
+            
+            <!-- Card 1: Due Soon (Gold Accent) -->
+            <div class="bg-surface-container-lowest p-space-md rounded-xl border border-surface-container-high shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow relative overflow-hidden">
+              <div class="absolute top-0 left-0 right-0 h-1 bg-gold"></div>
+              <div class="flex items-start justify-between mb-space-sm">
+                <div class="w-10 h-10 rounded-lg bg-gold-50 text-gold-800 flex items-center justify-center border border-gold-200">
+                  <span class="material-symbols-outlined text-[22px]">schedule</span>
+                </div>
+                <span class="px-space-sm py-0.5 rounded-full badge-gold font-label-sm text-[11px] font-semibold flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-gold-700 animate-pulse"></span>
+                  Next 48 Hours
+                </span>
+              </div>
+              <div>
+                <div class="flex items-baseline gap-space-xs">
+                  <span class="font-display-lg text-2xl font-bold text-on-surface">${dueSoonCount}</span>
+                  <span class="font-label-lg text-xs font-semibold text-on-surface-variant">Due Soon</span>
+                </div>
+                <p class="font-body-sm text-xs text-secondary mt-1">Computer Networks Lab & Distributed Queries report</p>
+              </div>
+              <div class="mt-space-md pt-space-sm border-t border-surface-container-high flex items-center justify-between text-primary font-label-sm text-xs font-semibold">
+                <a href="#/subject-and-assignments" class="hover:underline flex items-center gap-1">
+                  <span>Oldest deadline: Tomorrow 23:59</span>
+                  <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Card 2: Submitted (Approved / In Grading) -->
+            <div class="bg-surface-container-lowest p-space-md rounded-xl border border-surface-container-high shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow relative overflow-hidden">
+              <div class="absolute top-0 left-0 right-0 h-1 bg-emerald-600"></div>
+              <div class="flex items-start justify-between mb-space-sm">
+                <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-800 flex items-center justify-center border border-emerald-200">
+                  <span class="material-symbols-outlined text-[22px]">verified</span>
+                </div>
+                <span class="px-space-sm py-0.5 rounded-full badge-approved font-label-sm text-[11px] font-semibold">
+                  87.5% Complete
+                </span>
+              </div>
+              <div>
+                <div class="flex items-baseline gap-space-xs">
+                  <span class="font-display-lg text-2xl font-bold text-on-surface">${submittedCount}</span>
+                  <span class="font-label-lg text-xs font-semibold text-on-surface-variant">Submitted</span>
+                </div>
+                <p class="font-body-sm text-xs text-secondary mt-1">Across 5 registered courses this academic term</p>
+              </div>
+              <div class="mt-space-md pt-space-sm border-t border-surface-container-high flex items-center justify-between text-emerald-700 font-label-sm text-xs font-semibold">
+                <span>12 Approved • 2 In Grading</span>
+                <span class="material-symbols-outlined text-[15px]">task_alt</span>
+              </div>
+            </div>
+
+            <!-- Card 3: Action Needed (Maroon Revision Alert) -->
+            <div class="bg-surface-container-lowest p-space-md rounded-xl border border-maroon-200 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow relative overflow-hidden">
+              <div class="absolute top-0 left-0 right-0 h-1 bg-primary"></div>
+              <div class="flex items-start justify-between mb-space-sm">
+                <div class="w-10 h-10 rounded-lg bg-error-container text-on-error-container flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[22px]">error_outline</span>
+                </div>
+                <span class="px-space-sm py-0.5 rounded-full badge-revision font-label-sm text-[11px] font-semibold flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-error animate-ping"></span>
+                  Revision Alert
+                </span>
+              </div>
+              <div>
+                <div class="flex items-baseline gap-space-xs">
+                  <span class="font-display-lg text-2xl font-bold text-error">${actionNeeded}</span>
+                  <span class="font-label-lg text-xs font-semibold text-on-surface">Action Needed</span>
+                </div>
+                <p class="font-body-sm text-xs text-secondary mt-1">Revision requested by Dr. Evelyn Reed (Routing Lab)</p>
+              </div>
+              <div class="mt-space-md pt-space-sm border-t border-surface-container-high flex items-center justify-between text-xs">
+                <a href="#/student-submission" class="inline-flex items-center gap-1 text-primary hover:underline font-semibold">
+                  <span>Resolve revision now</span>
+                  <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
+                </a>
+                <span class="font-label-sm text-[11px] text-error font-semibold">Closes in 18h</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Urgent Action Banner: High-Priority Revision -->
+          <div class="bg-gradient-to-r from-maroon-800 to-maroon-900 rounded-xl p-space-md text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 border border-maroon-950">
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center shrink-0 border border-white/20">
+                <span class="material-symbols-outlined text-gold-300 text-[24px]">assignment_late</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-semibold text-sm text-white">CS-601: Assignment 2 Revision Requested</span>
+                  <span class="px-2 py-0.5 rounded badge-gold text-[10px] font-bold">Feedback Waiting</span>
+                </div>
+                <p class="text-white/80 text-xs mt-1">
+                  "Alex, your distance vector calculation has a count-to-infinity flaw. Implement split horizon with poison reverse."
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0 self-end md:self-center">
+              <a href="#/student-submission" class="px-4 py-2 bg-gold hover:bg-gold-600 text-maroon-950 font-bold text-xs rounded-lg transition-colors shadow-sm flex items-center gap-1.5">
+                <span>Inspect Feedback & Resubmit</span>
+                <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Academic Subjects Section -->
+          <div class="flex flex-col gap-space-sm">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="font-headline-lg text-lg font-bold text-on-surface">Registered Courses</h2>
+                <p class="font-body-sm text-xs text-on-surface-variant">Fall Term 2024 • Academic Track</p>
+              </div>
+              <a href="#/subject-and-assignments" class="text-xs font-semibold text-primary hover:underline flex items-center gap-1">
+                <span>View all assignments</span>
+                <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+              </a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-md">
+              ${state.subjects.map(s => `
+                <div class="bg-surface-container-lowest p-4 rounded-xl border border-surface-container-high shadow-xs hover:border-primary/40 hover:shadow-md transition-all flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="px-2 py-0.5 rounded badge-maroon text-[10px] font-bold uppercase">${s.code}</span>
+                      <span class="text-[11px] font-semibold text-tertiary">${s.credits} Credits</span>
+                    </div>
+                    <h3 class="font-bold text-sm text-on-surface">${s.name}</h3>
+                    <p class="text-xs text-secondary mt-1 line-clamp-2">${s.description}</p>
+                    <div class="flex items-center gap-1 text-[11px] text-on-surface-variant mt-2">
+                      <span class="material-symbols-outlined text-[14px] text-primary">person</span>
+                      <span>${s.instructor}</span>
+                    </div>
+                  </div>
+
+                  <div class="mt-4 pt-3 border-t border-surface-container-high flex items-center justify-between">
+                    <span class="text-[11px] text-secondary font-medium">Term Progress: ${s.progress}%</span>
+                    <a href="#/subject-and-assignments" class="px-2.5 py-1 bg-surface-container hover:bg-primary hover:text-white rounded text-xs font-semibold text-primary transition-colors">
+                      Open Course
+                    </a>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Recent Submissions Table -->
+          <div class="bg-surface-container-lowest rounded-xl border border-surface-container-high p-space-md shadow-xs flex flex-col gap-3">
+            <div class="flex items-center justify-between">
+              <h2 class="font-headline-lg text-base font-bold text-on-surface">Recent Submission Submissions</h2>
+              <span class="text-xs text-secondary">Logged in Student Workspace</span>
+            </div>
+            
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead>
+                  <tr class="border-b border-surface-container-high bg-surface-container-low text-secondary font-semibold">
+                    <th class="p-2.5">Course</th>
+                    <th class="p-2.5">Assignment</th>
+                    <th class="p-2.5">Version</th>
+                    <th class="p-2.5">Submitted On</th>
+                    <th class="p-2.5">Status</th>
+                    <th class="p-2.5 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-surface-container-high">
+                  ${state.submissions.filter(s => s.studentRoll === u.id).map(sub => `
+                    <tr class="hover:bg-surface-container-low transition-colors">
+                      <td class="p-2.5 font-bold text-primary">${sub.subjectCode}</td>
+                      <td class="p-2.5 font-medium text-on-surface">${sub.title}</td>
+                      <td class="p-2.5 font-mono text-[11px]">${sub.version}</td>
+                      <td class="p-2.5 text-secondary">${sub.uploadTime}</td>
+                      <td class="p-2.5">
+                        <span class="px-2 py-0.5 rounded-full font-semibold text-[10px] ${
+                          sub.status === 'Approved' ? 'badge-approved' :
+                          sub.status === 'Needs Revision' ? 'badge-revision' : 'badge-gold'
+                        }">
+                          ${sub.status}
+                        </span>
+                      </td>
+                      <td class="p-2.5 text-right">
+                        <a href="#/student-submission" class="text-primary hover:underline font-semibold">Details</a>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // 3. SUBJECT & ASSIGNMENTS PAGE (Computer Networks CS-601)
+    // =========================================================================
+    function renderSubjectPage() {
+      const subject = state.subjects[0]; // CS-601
+
+      return `
+        <div class="flex flex-col w-full gap-space-lg">
+          
+          <!-- Breadcrumb Navigation -->
+          <div class="flex items-center justify-between">
+            <nav class="flex items-center gap-1.5 text-xs text-secondary font-medium">
+              <a href="#/student-dashboard" class="hover:text-primary transition-colors flex items-center gap-1">
+                <span class="material-symbols-outlined text-[15px]">dashboard</span>
+                <span>Dashboard</span>
+              </a>
+              <span class="text-outline">/</span>
+              <span class="text-on-surface font-semibold">${subject.name} (${subject.code})</span>
+              <span class="ml-2 px-2 py-0.5 rounded-full badge-maroon text-[10px] font-bold">Fall 2024</span>
+            </nav>
+            <div class="flex items-center gap-2">
+              <span class="flex items-center gap-1 badge-gold text-[11px] font-semibold px-2.5 py-1 rounded-full">
+                <span class="w-2 h-2 rounded-full bg-gold-700 animate-pulse"></span>
+                Term Active • 4 Weeks Left
+              </span>
+            </div>
+          </div>
+
+          <!-- Subject Hero Banner -->
+          <div class="relative overflow-hidden rounded-xl bg-surface-container-low border border-surface-container-high p-6 shadow-xs">
+            <div class="absolute -right-16 -top-16 w-96 h-96 rounded-full bg-primary/5 blur-3xl pointer-events-none"></div>
+            
+            <div class="relative flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+              <!-- Course Info -->
+              <div class="flex-1 max-w-2xl">
+                <div class="flex flex-wrap items-center gap-2 mb-2">
+                  <span class="px-2.5 py-0.5 rounded-full badge-maroon font-label-sm text-[11px] font-bold uppercase tracking-wider">
+                    Core Module • CS Major
+                  </span>
+                  <span class="px-2 py-0.5 rounded-full bg-surface-container-highest text-on-surface font-mono text-[11px]">
+                    ${subject.credits} Credits
+                  </span>
+                  <span class="px-2 py-0.5 rounded-full badge-gold text-[11px] font-semibold">
+                    Section ${subject.section}
+                  </span>
+                </div>
+                <h1 class="font-display-lg text-2xl font-bold text-on-surface tracking-tight mb-2">
+                  ${subject.name}
+                </h1>
+                <p class="font-body-lg text-xs sm:text-sm text-secondary leading-relaxed mb-4">
+                  ${subject.description}
+                </p>
+                <div class="flex flex-wrap items-center gap-4">
+                  <button onclick="simulateSyllabusDownload()" class="flex items-center gap-2 px-3.5 py-2 bg-surface-container-lowest text-on-surface rounded-lg border border-surface-container-high hover:border-primary hover:text-primary shadow-xs transition-all text-xs font-semibold">
+                    <span class="material-symbols-outlined text-primary text-[18px]">description</span>
+                    <span>Download Syllabus (PDF • 1.4 MB)</span>
+                    <span class="material-symbols-outlined text-outline text-[15px]">download</span>
+                  </button>
+                  <div class="flex items-center gap-1.5 text-secondary text-xs">
+                    <span class="material-symbols-outlined text-[17px] text-tertiary">location_on</span>
+                    <span>${subject.room}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Instructor Card (Using Local Photo image-2.jpg) -->
+              <div class="w-full lg:w-80 bg-surface-container-lowest rounded-xl p-4 border border-surface-container-high shadow-xs shrink-0">
+                <div class="flex items-center gap-3 mb-2">
+                  <img src="public/images/image-2.jpg" alt="Dr. Evelyn Reed in Lecture" class="w-12 h-12 rounded-full object-cover border-2 border-gold/40 shadow-xs shrink-0"/>
+                  <div class="flex flex-col">
+                    <span class="font-bold text-xs text-on-surface leading-tight">${subject.instructor}</span>
+                    <span class="text-[11px] text-primary font-semibold">Lead Course Faculty</span>
+                    <span class="text-[10px] text-secondary">Office: Room 412B</span>
+                  </div>
+                </div>
+                <p class="text-[11px] text-secondary border-t border-surface-container-high pt-2">
+                  Office Hours: Tue & Thu 14:00–16:30. Dedicated TA sessions held every Friday afternoon in Lab 4.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Assignment Filter & List Section -->
+          <div class="flex flex-col gap-space-md">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h2 class="font-headline-lg text-lg font-bold text-on-surface">Course Assignments & Labs</h2>
+                <p class="font-body-sm text-xs text-on-surface-variant">Review requirements, due dates, and submission feedback.</p>
+              </div>
+              <!-- Status Filter Pills -->
+              <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
+                <button onclick="filterSubjectAssignments('all')" class="px-2.5 py-1 rounded-full badge-maroon text-xs font-bold shadow-2xs">All (4)</button>
+                <button onclick="filterSubjectAssignments('due')" class="px-2.5 py-1 rounded-full badge-gold text-xs font-semibold">Due Soon (1)</button>
+                <button onclick="filterSubjectAssignments('revision')" class="px-2.5 py-1 rounded-full badge-revision text-xs font-semibold">Needs Revision (1)</button>
+                <button onclick="filterSubjectAssignments('approved')" class="px-2.5 py-1 rounded-full badge-approved text-xs font-semibold">Graded (1)</button>
+              </div>
+            </div>
+
+            <!-- Assignments Grid -->
+            <div id="subject-assignments-list" class="flex flex-col gap-3">
+              ${state.assignments.filter(a => a.subjectId === "CS-601").map(asg => `
+                <div class="bg-surface-container-lowest rounded-xl border border-surface-container-high p-space-md shadow-xs hover:border-primary/40 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
+                      asg.status === 'Needs Revision' ? 'bg-error-container text-on-error-container' :
+                      asg.status === 'Approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-gold-100 text-gold-800'
+                    }">
+                      <span class="material-symbols-outlined text-[22px]">
+                        ${asg.status === 'Needs Revision' ? 'priority_high' : asg.status === 'Approved' ? 'check_circle' : 'assignment'}
+                      </span>
+                    </div>
+                    <div>
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <h3 class="font-bold text-sm text-on-surface">${asg.title}</h3>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          asg.status === 'Approved' ? 'badge-approved' :
+                          asg.status === 'Needs Revision' ? 'badge-revision' : 'badge-gold'
+                        }">
+                          ${asg.status}
+                        </span>
+                      </div>
+                      <p class="text-xs text-secondary mt-1 max-w-2xl">${asg.brief}</p>
+                      <div class="flex items-center gap-3 text-[11px] text-secondary mt-2 flex-wrap">
+                        <span class="flex items-center gap-1 font-medium">
+                          <span class="material-symbols-outlined text-[15px] text-outline">schedule</span>
+                          Due: ${asg.dueDate}
+                        </span>
+                        <span>•</span>
+                        <span>Max Score: <strong>${asg.maxScore} pts</strong></span>
+                        ${asg.score ? `<span>•</span><span class="font-bold text-emerald-700">Score: ${asg.score}/100</span>` : ''}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center gap-2 shrink-0 self-end md:self-center">
+                    ${asg.status === 'Needs Revision' ? `
+                      <a href="#/student-submission" class="px-3.5 py-2 bg-primary hover:bg-maroon-700 text-on-primary font-bold text-xs rounded-lg transition-colors flex items-center gap-1 shadow-xs">
+                        <span>View Feedback & Resubmit</span>
+                        <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                      </a>
+                    ` : asg.status === 'Due Soon' ? `
+                      <a href="#/assignment-upload" class="px-3.5 py-2 bg-primary hover:bg-maroon-700 text-on-primary font-bold text-xs rounded-lg transition-colors flex items-center gap-1 shadow-xs">
+                        <span class="material-symbols-outlined text-[16px]">upload_file</span>
+                        <span>Upload Work</span>
+                      </a>
+                    ` : `
+                      <a href="#/student-submission" class="px-3.5 py-2 bg-surface-container hover:bg-surface-container-high text-on-surface font-semibold text-xs rounded-lg transition-colors flex items-center gap-1">
+                        <span>Submission Record</span>
+                        <span class="material-symbols-outlined text-[16px]">visibility</span>
+                      </a>
+                    `}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+        </div>
+      `;
+    }
+
+    function simulateSyllabusDownload() {
+      showToast("Downloading syllabus CS-601_Syllabus_2024.pdf (1.4 MB)...", "info");
+      setTimeout(() => {
+        showToast("Syllabus download verified from university asset server.", "success");
+      }, 1200);
+    }
+
+    function filterSubjectAssignments(filter) {
+      showToast(`Showing ${filter.toUpperCase()} assignments for CS-601.`, "info");
+    }
+
+    // =========================================================================
+    // 4. ASSIGNMENT UPLOAD FORM (Drag-and-Drop, S3 Simulation, Revision Notes)
+    // =========================================================================
+    function renderAssignmentUploadPage() {
+      const asg = state.assignments[0]; // Assignment 3
+
+      return `
+        <div class="flex flex-col w-full gap-space-lg">
+          
+          <!-- Breadcrumb -->
+          <div class="flex items-center gap-1.5 text-xs text-secondary font-medium">
+            <a href="#/subject-and-assignments" class="hover:text-primary transition-colors flex items-center gap-1">
+              <span class="material-symbols-outlined text-[15px]">menu_book</span>
+              <span>My Subjects</span>
+            </a>
+            <span class="material-symbols-outlined text-[14px] text-outline">chevron_right</span>
+            <a href="#/subject-and-assignments" class="hover:text-primary transition-colors font-medium">Computer Networks (CS-601)</a>
+            <span class="material-symbols-outlined text-[14px] text-outline">chevron_right</span>
+            <span class="text-on-surface font-semibold">${asg.title}</span>
+          </div>
+
+          <!-- Dual Column Upload Workspace -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+            
+            <!-- Left Column: Primary Upload Form (8 Cols) -->
+            <section class="lg:col-span-8 flex flex-col gap-space-lg">
+              
+              <!-- Overview Card -->
+              <div class="bg-surface-container-lowest rounded-xl p-space-lg border border-surface-container-high shadow-xs relative overflow-hidden">
+                <div class="flex flex-col md:flex-row md:items-start justify-between gap-3 mb-4">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="px-2.5 py-0.5 rounded badge-maroon text-[11px] font-bold uppercase">CS-601</span>
+                      <span class="text-xs text-secondary font-semibold">Advanced Networking Systems</span>
+                    </div>
+                    <h1 class="font-headline-lg text-xl font-bold text-on-surface tracking-tight mt-1">
+                      ${asg.title}
+                    </h1>
+                  </div>
+                  <div class="flex flex-col md:items-end">
+                    <span class="inline-flex items-center gap-1 badge-gold px-3 py-1 rounded-full font-bold text-xs shadow-2xs">
+                      <span class="material-symbols-outlined text-[15px]">timer</span>
+                      <span>${asg.hoursRemaining} hours remaining</span>
+                    </span>
+                    <span class="text-[11px] text-secondary mt-1">Due ${asg.dueDate}</span>
+                  </div>
+                </div>
+
+                <div class="p-3 bg-surface-container-low rounded-lg border border-surface-container-high text-xs text-secondary leading-relaxed">
+                  <span class="font-semibold text-primary block mb-0.5">Task Specification Brief:</span>
+                  ${asg.brief}
+                </div>
+              </div>
+
+              <!-- Interactive File Upload Dropzone Form -->
+              <div class="bg-surface-container-lowest rounded-xl p-space-lg border border-surface-container-high shadow-xs flex flex-col gap-space-md">
+                <div class="flex items-center justify-between border-b border-surface-container-high pb-3">
+                  <h2 class="font-headline-sm text-base font-bold text-on-surface">Upload Submission Archive</h2>
+                  <span class="text-[11px] text-secondary">Accepted formats: .zip, .tar.gz, .pdf, .py (Max 25 MB)</span>
+                </div>
+
+                <!-- Hidden Native File Input -->
+                <input type="file" id="assignment-file-input" class="hidden" accept=".zip,.tar.gz,.pdf,.py,.c,.cpp" onchange="handleFileSelected(event)"/>
+
+                <!-- Drag & Drop Interactive Zone -->
+                <div id="dropzone" onclick="triggerFilePicker()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleFileDrop(event)"
+                     class="border-2 border-dashed border-outline-variant hover:border-primary rounded-xl p-8 bg-surface-container-low hover:bg-maroon-50/30 transition-all flex flex-col items-center justify-center text-center cursor-pointer group">
+                  <div class="w-14 h-14 rounded-full bg-surface-container-lowest border border-surface-container-high flex items-center justify-center text-primary group-hover:scale-105 transition-transform shadow-xs mb-3">
+                    <span class="material-symbols-outlined text-[30px]">cloud_upload</span>
+                  </div>
+                  <span class="font-bold text-sm text-on-surface">Click to browse file or drag and drop here</span>
+                  <span class="text-xs text-secondary mt-1">Upload your complete project repository with unit tests and README</span>
+                  <span class="mt-3 px-3 py-1 bg-surface-container-lowest border border-surface-container-high rounded text-[11px] font-semibold text-primary shadow-2xs group-hover:bg-primary group-hover:text-white transition-colors">
+                    Browse File System
+                  </span>
+                </div>
+
+                <!-- Selected File Card (Hidden until file selected) -->
+                <div id="selected-file-card" class="hidden p-3.5 rounded-xl bg-surface-container-low border border-primary/30 flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-primary text-on-primary flex items-center justify-center">
+                      <span class="material-symbols-outlined text-[22px]">folder_zip</span>
+                    </div>
+                    <div>
+                      <span id="file-name-display" class="font-bold text-xs text-on-surface block">alex_chen_socket_lab.zip</span>
+                      <span id="file-size-display" class="text-[11px] text-secondary">3.4 MB • Ready for S3 Upload</span>
+                    </div>
+                  </div>
+                  <button type="button" onclick="clearSelectedFile()" class="p-1.5 rounded-lg text-error hover:bg-error-container hover:text-on-error-container transition-colors" title="Remove file">
+                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                  </button>
+                </div>
+
+                <!-- Revision Notes / Student Comment Field -->
+                <div class="flex flex-col gap-1.5">
+                  <label for="submission-comment" class="font-label-md text-xs font-semibold text-on-surface">
+                    Student Submission Notes / Revision Changelog (Optional)
+                  </label>
+                  <textarea id="submission-comment" rows="3" class="w-full p-3 bg-surface-container-lowest border border-surface-container-high rounded-lg text-xs text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="Detail any architecture choices, bug fixes, or instructions for the instructor..."></textarea>
+                </div>
+
+                <!-- Submission Version Selector -->
+                <div class="flex items-center justify-between p-3 rounded-lg bg-surface-container-low border border-surface-container-high text-xs">
+                  <span class="font-semibold text-on-surface">Submission Target Version:</span>
+                  <div class="flex items-center gap-2">
+                    <label class="flex items-center gap-1.5 cursor-pointer">
+                      <input type="radio" name="sub-version" value="v1.0" checked class="text-primary focus:ring-primary"/>
+                      <span>Initial (v1.0)</span>
+                    </label>
+                    <label class="flex items-center gap-1.5 cursor-pointer ml-3">
+                      <input type="radio" name="sub-version" value="v1.1" class="text-primary focus:ring-primary"/>
+                      <span>Revision (v1.1)</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Simulated AWS S3 Upload Notice & Progress Bar -->
+                <div class="p-3 rounded-lg bg-gold-50/70 border border-gold-200 text-[11px] text-gold-900 flex flex-col gap-2">
+                  <div class="flex items-center justify-between">
+                    <span class="flex items-center gap-1.5 font-bold text-gold-950">
+                      <span class="material-symbols-outlined text-[16px] text-gold-700">lock</span>
+                      Simulated AWS S3 Pre-Signed Upload Flow
+                    </span>
+                    <span class="font-mono text-[10px] text-gold-800">Target: s3://student-drive-assignments-dyp-dpu/</span>
+                  </div>
+                  <p class="text-[11px] text-gold-800 leading-tight">
+                    In production, frontend requests a short-lived PUT Pre-Signed URL via API Gateway / Lambda, then uploads the encrypted zip directly to private S3 without public bucket permissions.
+                  </p>
+                  <!-- Animated Upload Progress Bar -->
+                  <div id="upload-progress-wrapper" class="hidden flex flex-col gap-1 mt-1">
+                    <div class="w-full bg-gold-200 rounded-full h-2 overflow-hidden">
+                      <div id="upload-progress-bar" class="bg-primary h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                    <span id="upload-progress-text" class="text-[10px] font-bold text-primary text-right">Uploading... 0%</span>
+                  </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button id="submit-assignment-btn" onclick="submitAssignmentWork()" class="w-full py-3 px-4 bg-primary hover:bg-maroon-700 active:bg-maroon-900 text-on-primary font-bold text-xs rounded-lg shadow-sm transition-all flex items-center justify-center gap-2">
+                  <span class="material-symbols-outlined text-base">cloud_upload</span>
+                  <span>Submit Assignment to Faculty Review Queue</span>
+                </button>
+              </div>
+
+            </section>
+
+            <!-- Right Column: Submission Guidelines & Rubric (4 Cols) -->
+            <aside class="lg:col-span-4 flex flex-col gap-space-md">
+              
+              <div class="bg-surface-container-lowest rounded-xl p-4 border border-surface-container-high shadow-xs flex flex-col gap-3">
+                <div class="flex items-center gap-2 pb-2 border-b border-surface-container-high">
+                  <span class="material-symbols-outlined text-primary text-lg">checklist</span>
+                  <h3 class="font-bold text-xs text-on-surface">Grading Criteria Checklist</h3>
+                </div>
+                <div class="flex flex-col gap-2.5 text-xs text-secondary">
+                  <div class="flex items-start gap-2">
+                    <span class="material-symbols-outlined text-emerald-600 text-[16px] shrink-0 mt-0.5">check_box</span>
+                    <span><strong>Correctness (30 pts):</strong> RFC-compliant socket parsing, handshake, and packet serialization.</span>
+                  </div>
+                  <div class="flex items-start gap-2">
+                    <span class="material-symbols-outlined text-emerald-600 text-[16px] shrink-0 mt-0.5">check_box</span>
+                    <span><strong>Code Quality (20 pts):</strong> Clean function separation, typing, and zero memory leaks.</span>
+                  </div>
+                  <div class="flex items-start gap-2">
+                    <span class="material-symbols-outlined text-emerald-600 text-[16px] shrink-0 mt-0.5">check_box</span>
+                    <span><strong>Unit Tests (25 pts):</strong> Minimum 80% code coverage across socket timeout scenarios.</span>
+                  </div>
+                  <div class="flex items-start gap-2">
+                    <span class="material-symbols-outlined text-emerald-600 text-[16px] shrink-0 mt-0.5">check_box</span>
+                    <span><strong>Documentation (25 pts):</strong> README with architecture graph and reproduce instructions.</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Integrity Pledge -->
+              <div class="bg-surface-container-lowest rounded-xl p-4 border border-surface-container-high shadow-xs text-xs text-secondary flex flex-col gap-2">
+                <span class="font-bold text-on-surface flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-tertiary text-base">verified_user</span>
+                  Academic Honor Code
+                </span>
+                <p class="text-[11px] leading-relaxed">
+                  By submitting this work, you certify that all source files and documentation are your original work conducted in accordance with DYP DPU academic integrity policies.
+                </p>
+              </div>
+
+            </aside>
+
+          </div>
+
+        </div>
+      `;
+    }
+
+    let selectedUploadFile = null;
+
+    function initUploadScripts() {
+      selectedUploadFile = null;
+    }
+
+    function triggerFilePicker() {
+      const input = document.getElementById("assignment-file-input");
+      if (input) input.click();
+    }
+
+    function handleFileSelected(e) {
+      if (e.target.files && e.target.files[0]) {
+        processFile(e.target.files[0]);
+      }
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      const dropzone = document.getElementById("dropzone");
+      if (dropzone) dropzone.classList.add("border-primary", "bg-maroon-50");
+    }
+
+    function handleDragLeave(e) {
+      e.preventDefault();
+      const dropzone = document.getElementById("dropzone");
+      if (dropzone) dropzone.classList.remove("border-primary", "bg-maroon-50");
+    }
+
+    function handleFileDrop(e) {
+      e.preventDefault();
+      handleDragLeave(e);
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        processFile(e.dataTransfer.files[0]);
+      }
+    }
+
+    function processFile(file) {
+      selectedUploadFile = file;
+      const dropzone = document.getElementById("dropzone");
+      const card = document.getElementById("selected-file-card");
+      const nameDisp = document.getElementById("file-name-display");
+      const sizeDisp = document.getElementById("file-size-display");
+
+      const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+      if (nameDisp) nameDisp.textContent = file.name;
+      if (sizeDisp) sizeDisp.textContent = `${sizeInMB} MB • File verified and ready for S3 upload`;
+
+      if (dropzone) dropzone.classList.add("hidden");
+      if (card) card.classList.remove("hidden");
+      showToast(`Selected file: ${file.name} (${sizeInMB} MB)`, "info");
+    }
+
+    function clearSelectedFile() {
+      selectedUploadFile = null;
+      const dropzone = document.getElementById("dropzone");
+      const card = document.getElementById("selected-file-card");
+      const input = document.getElementById("assignment-file-input");
+
+      if (input) input.value = "";
+      if (dropzone) dropzone.classList.remove("hidden");
+      if (card) card.classList.add("hidden");
+    }
+
+    function submitAssignmentWork() {
+      const btn = document.getElementById("submit-assignment-btn");
+      const commentInput = document.getElementById("submission-comment");
+      const comment = commentInput ? commentInput.value.trim() : "";
+      
+      const fileName = selectedUploadFile ? selectedUploadFile.name : "alex_chen_cs2023084_asg3.zip";
+      const fileSize = selectedUploadFile ? (selectedUploadFile.size / (1024 * 1024)).toFixed(1) + " MB" : "3.4 MB";
+
+      // Animate simulated S3 progress
+      const progressWrapper = document.getElementById("upload-progress-wrapper");
+      const progressBar = document.getElementById("upload-progress-bar");
+      const progressText = document.getElementById("upload-progress-text");
+
+      if (progressWrapper) progressWrapper.classList.remove("hidden");
+      if (btn) {
+        btn.disabled = true;
+        btn.classList.add("opacity-70", "cursor-not-allowed");
+      }
+
+      let pct = 0;
+      const interval = setInterval(() => {
+        pct += 25;
+        if (progressBar) progressBar.style.width = pct + "%";
+        if (progressText) progressText.textContent = `Streaming chunks to S3: ${pct}%`;
+
+        if (pct >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            // Add new submission record to state
+            const newSub = {
+              id: "sub-" + Date.now(),
+              studentId: "CS-2023-084",
+              studentName: "Alex Chen",
+              studentRoll: "CS-2023-084",
+              assignmentId: "asg-3",
+              subjectCode: "CS-601",
+              title: "Assignment 3: TCP/UDP Socket Implementation",
+              version: "v1.1",
+              fileName: fileName,
+              fileSize: fileSize,
+              uploadTime: "Just now",
+              status: "Pending Review",
+              s3Key: `s3://student-drive-assignments-dyp-dpu/cs-601/cs-2023-084/${fileName}`,
+              comment: comment || "Student updated assignment files with full test suite.",
+              scores: { correctness: 28, modularity: 20, tests: 24, docs: 15 },
+              feedback: ""
+            };
+
+            state.submissions.unshift(newSub);
+            saveState(state);
+            showToast("Assignment uploaded successfully to DYP DPU Student Drive!", "success");
+            window.location.hash = "#/student-submission";
+          }, 400);
+        }
+      }, 200);
+    }
+
+    // =========================================================================
+    // 5. STUDENT SUBMISSION DETAILS (Timeline, Teacher Feedback, Rubric)
+    // =========================================================================
+    function renderStudentSubmissionDetails() {
+      const sub = state.submissions.find(s => s.assignmentId === "asg-2") || state.submissions[0];
+      const asg = state.assignments.find(a => a.id === "asg-2") || state.assignments[0];
+
+      return `
+        <div class="flex flex-col w-full gap-space-lg">
+          
+          <!-- Top Breadcrumb -->
+          <nav class="flex items-center gap-1.5 text-xs text-secondary font-medium">
+            <a href="#/student-dashboard" class="hover:text-primary transition-colors">Courses</a>
+            <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+            <a href="#/subject-and-assignments" class="hover:text-primary transition-colors">CS-601: Computer Networks</a>
+            <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+            <span class="text-on-surface font-semibold">${sub.title}</span>
+          </nav>
+
+          <!-- Title & Course Header -->
+          <div class="flex flex-wrap items-center justify-between gap-space-md">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full badge-maroon text-[11px] font-bold uppercase tracking-wide">Core Module</span>
+                <span class="text-secondary text-xs">AY 2024–2025 • Fall Term</span>
+              </div>
+              <h1 class="font-display-lg text-2xl font-bold text-on-surface tracking-tight mt-1">
+                ${sub.title}
+              </h1>
+            </div>
+
+            <!-- Instructor & Deadline Card -->
+            <div class="flex items-center gap-4 bg-surface-container-lowest px-4 py-2 rounded-xl border border-surface-container-high shadow-xs">
+              <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-bold">
+                  <span class="material-symbols-outlined text-[18px]">psychology</span>
+                </div>
+                <div class="flex flex-col">
+                  <span class="text-[10px] text-secondary">Instructor</span>
+                  <span class="font-bold text-xs text-on-surface">Dr. Evelyn Reed</span>
+                </div>
+              </div>
+              <div class="h-6 w-px bg-surface-container-high"></div>
+              <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-full badge-revision flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[18px]">timer</span>
+                </div>
+                <div class="flex flex-col">
+                  <span class="text-[10px] text-secondary">Deadline</span>
+                  <span class="font-bold text-xs text-on-surface">${asg.dueDate}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Prominent Status Banner -->
+          <div class="relative overflow-hidden rounded-xl ${sub.status === 'Approved' ? 'bg-emerald-900 text-white' : 'bg-gradient-to-r from-maroon-800 to-maroon-900 text-white'} p-5 shadow-sm border border-maroon-950">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative z-10">
+              <div class="flex items-start gap-3">
+                <div class="p-2.5 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined text-[24px] ${sub.status === 'Approved' ? 'text-emerald-300' : 'text-gold-300'}">
+                    ${sub.status === 'Approved' ? 'task_alt' : 'assignment_late'}
+                  </span>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="font-bold text-base text-white">
+                      ${sub.status === 'Approved' ? 'Submission Approved & Recorded' : 'Action Required: Revision Requested by Faculty'}
+                    </span>
+                    <span class="px-2 py-0.5 rounded badge-gold text-[10px] font-bold">
+                      ${sub.version} Evaluated
+                    </span>
+                  </div>
+                  <p class="text-white/80 text-xs mt-1 leading-relaxed max-w-3xl">
+                    ${sub.status === 'Approved'
+                      ? 'Dr. Evelyn Reed has approved your submission and recorded the final score into your transcript.'
+                      : 'Your initial submission was evaluated by Dr. Evelyn Reed. Revisions must be submitted prior to the deadline.'}
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 shrink-0 self-end lg:self-center">
+                <a href="#/assignment-upload" class="px-4 py-2 bg-gold hover:bg-gold-600 text-maroon-950 font-bold text-xs rounded-lg transition-colors shadow-sm flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[16px]">upload_file</span>
+                  <span>Upload Revised Package</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Two-Column Review Detail Section -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+            
+            <!-- Left Column: Instructor Feedback & Rubric (7 Cols) -->
+            <section class="lg:col-span-7 flex flex-col gap-space-md">
+              
+              <!-- Direct Teacher Feedback Box -->
+              <div class="bg-surface-container-lowest rounded-xl p-space-lg border border-surface-container-high shadow-xs flex flex-col gap-3">
+                <div class="flex items-center justify-between pb-2 border-b border-surface-container-high">
+                  <div class="flex items-center gap-2">
+                    <img src="public/images/image-2.jpg" alt="Dr. Reed" class="w-7 h-7 rounded-full object-cover border border-gold"/>
+                    <span class="font-bold text-xs text-on-surface">Instructor Evaluation Feedback</span>
+                  </div>
+                  <span class="text-[11px] text-secondary">Oct 23, 2024 • 11:20 AM</span>
+                </div>
+                
+                <div class="p-3.5 rounded-lg bg-surface-container-low border border-surface-container-high text-xs text-on-surface leading-relaxed">
+                  <p class="font-medium text-maroon-900">
+                    "${sub.feedback || asg.teacherFeedback}"
+                  </p>
+                </div>
+
+                <div class="text-[11px] text-secondary">
+                  <strong>Instructor Notes:</strong> You have 1 remaining revision attempt for this assignment. Address the infinity loop condition before pushing your final commit.
+                </div>
+              </div>
+
+              <!-- Rubric Breakdown -->
+              <div class="bg-surface-container-lowest rounded-xl p-space-lg border border-surface-container-high shadow-xs flex flex-col gap-3">
+                <div class="flex items-center justify-between pb-2 border-b border-surface-container-high">
+                  <h3 class="font-bold text-xs text-on-surface">Criterion Scoring Breakdown</h3>
+                  <span class="font-bold text-xs text-primary">Score: 77 / 100</span>
+                </div>
+
+                <div class="flex flex-col gap-3 text-xs">
+                  <div>
+                    <div class="flex justify-between text-secondary mb-1">
+                      <span>Algorithm Correctness</span>
+                      <span class="font-bold text-on-surface">24 / 30 pts</span>
+                    </div>
+                    <div class="w-full bg-surface-container-high rounded-full h-2 overflow-hidden">
+                      <div class="bg-primary h-full rounded-full" style="width: 80%"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-secondary mb-1">
+                      <span>Code Quality & Modularity</span>
+                      <span class="font-bold text-on-surface">20 / 20 pts</span>
+                    </div>
+                    <div class="w-full bg-surface-container-high rounded-full h-2 overflow-hidden">
+                      <div class="bg-emerald-600 h-full rounded-full" style="width: 100%"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-secondary mb-1">
+                      <span>Automated Test Suite</span>
+                      <span class="font-bold text-on-surface">18 / 25 pts</span>
+                    </div>
+                    <div class="w-full bg-surface-container-high rounded-full h-2 overflow-hidden">
+                      <div class="bg-gold h-full rounded-full" style="width: 72%"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-secondary mb-1">
+                      <span>Documentation & Analysis</span>
+                      <span class="font-bold text-on-surface">15 / 15 pts</span>
+                    </div>
+                    <div class="w-full bg-surface-container-high rounded-full h-2 overflow-hidden">
+                      <div class="bg-emerald-600 h-full rounded-full" style="width: 100%"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </section>
+
+            <!-- Right Column: Submission Artifact & Revision History (5 Cols) -->
+            <aside class="lg:col-span-5 flex flex-col gap-space-md">
+              
+              <!-- Artifact Details Card -->
+              <div class="bg-surface-container-lowest rounded-xl p-space-md border border-surface-container-high shadow-xs flex flex-col gap-3">
+                <span class="font-bold text-xs text-on-surface pb-2 border-b border-surface-container-high">Submitted Archive Artifact</span>
+                
+                <div class="flex items-center gap-3 p-3 bg-surface-container-low rounded-lg border border-surface-container-high">
+                  <div class="w-10 h-10 rounded-lg bg-primary text-on-primary flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[22px]">folder_zip</span>
+                  </div>
+                  <div class="flex flex-col min-w-0">
+                    <span class="font-bold text-xs text-on-surface truncate">${sub.fileName}</span>
+                    <span class="text-[11px] text-secondary">${sub.fileSize} • Uploaded ${sub.uploadTime}</span>
+                  </div>
+                </div>
+
+                <div class="flex flex-col gap-1 text-[11px] text-secondary">
+                  <span><strong>S3 Object Key:</strong> <code class="font-mono text-[10px] break-all">${sub.s3Key}</code></span>
+                  <span><strong>Integrity Checksum:</strong> <code class="font-mono text-[10px]">sha256:8f4c...3e1a</code></span>
+                </div>
+
+                <button onclick="simulateFileDownload('${sub.fileName}')" class="w-full py-2 bg-surface-container hover:bg-surface-container-high text-primary font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 border border-surface-container-high">
+                  <span class="material-symbols-outlined text-[16px]">download</span>
+                  <span>Download Submitted Archive</span>
+                </button>
+              </div>
+
+              <!-- Revision Timeline -->
+              <div class="bg-surface-container-lowest rounded-xl p-space-md border border-surface-container-high shadow-xs flex flex-col gap-3">
+                <span class="font-bold text-xs text-on-surface pb-2 border-b border-surface-container-high">Submission Revision Log</span>
+                
+                <div class="relative pl-4 border-l-2 border-primary flex flex-col gap-4 text-xs">
+                  <div class="relative">
+                    <span class="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-primary ring-4 ring-white"></span>
+                    <div class="flex items-center justify-between">
+                      <span class="font-bold text-on-surface">Revision v1.1</span>
+                      <span class="text-[10px] text-secondary">Oct 24 • 10:30 AM</span>
+                    </div>
+                    <p class="text-[11px] text-secondary mt-0.5">Updated poison reverse flag and routing loop suppression.</p>
+                  </div>
+
+                  <div class="relative">
+                    <span class="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-outline-variant ring-4 ring-white"></span>
+                    <div class="flex items-center justify-between">
+                      <span class="font-bold text-on-surface">Initial Submission v1.0</span>
+                      <span class="text-[10px] text-secondary">Oct 22 • 10:14 PM</span>
+                    </div>
+                    <p class="text-[11px] text-secondary mt-0.5">Distance vector graph topology simulation script.</p>
+                  </div>
+                </div>
+              </div>
+
+            </aside>
+
+          </div>
+
+        </div>
+      `;
+    }
+
+    function simulateFileDownload(fileName) {
+      showToast(`Generating pre-signed GET URL for ${fileName}...`, "info");
+      setTimeout(() => {
+        showToast(`Verification passed. Downloaded ${fileName}`, "success");
+      }, 1000);
+    }
+
+    // =========================================================================
+    // 6. TEACHER DASHBOARD (Submission Queue, Filter, Search, KPI Cards)
+    // =========================================================================
+    function renderTeacherDashboard() {
+      const u = state.currentUser.teacher;
+      const pendingCount = state.submissions.filter(s => s.status === "Pending Review").length;
+      const revisionCount = state.submissions.filter(s => s.status === "Needs Revision").length;
+      const approvedCount = state.submissions.filter(s => s.status === "Approved").length;
+
+      return `
+        <div class="flex flex-col w-full gap-space-lg">
+          
+          <!-- Faculty Context Banner -->
+          <div class="relative bg-surface-container-lowest rounded-xl p-space-lg border border-surface-container-high shadow-xs overflow-hidden">
+            <div class="absolute -right-12 -top-12 w-64 h-64 bg-primary/5 rounded-full pointer-events-none blur-3xl"></div>
+            
+            <div class="relative flex flex-col lg:flex-row items-start lg:items-center justify-between gap-space-lg">
+              <div class="flex items-center gap-4">
+                <img src="public/images/image-2.jpg" alt="Dr. Evelyn Reed" class="w-14 h-14 rounded-xl object-cover border-2 border-gold/40 shadow-xs shrink-0"/>
+                <div class="flex flex-col">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <h1 class="font-headline-lg text-xl font-bold text-on-surface tracking-tight">${u.name}</h1>
+                    <span class="px-2 py-0.5 rounded badge-maroon text-[10px] font-bold">${u.title}</span>
+                  </div>
+                  <div class="flex items-center gap-3 text-secondary text-xs mt-1 flex-wrap">
+                    <span class="flex items-center gap-1">
+                      <span class="material-symbols-outlined text-[15px] text-primary">domain</span>
+                      ${u.department}
+                    </span>
+                    <span>•</span>
+                    <span class="flex items-center gap-1 font-semibold text-tertiary">
+                      <span class="material-symbols-outlined text-[15px]">groups</span>
+                      ${u.activeCourses} Active Courses • ${u.enrolledStudents} Enrolled
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-3 bg-surface-container-low px-3.5 py-2 rounded-lg border border-surface-container-high text-xs">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary text-lg">event_available</span>
+                  <div>
+                    <span class="text-[10px] text-secondary uppercase font-semibold block">Office Hours Today</span>
+                    <span class="font-bold text-on-surface">${u.officeHours}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3 KPI Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
+            
+            <div class="bg-surface-container-lowest rounded-xl p-space-md border border-surface-container-high shadow-xs flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-error-container text-on-error-container flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[22px]">hourglass_top</span>
+                </div>
+                <div>
+                  <span class="text-xs text-secondary font-medium">Review Queue</span>
+                  <span class="font-display-lg text-2xl font-bold text-on-surface block mt-0.5">${pendingCount + revisionCount}</span>
+                </div>
+              </div>
+              <span class="px-2 py-0.5 rounded-full badge-revision text-[10px] font-bold">
+                Action Required
+              </span>
+            </div>
+
+            <div class="bg-surface-container-lowest rounded-xl p-space-md border border-surface-container-high shadow-xs flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-gold-50 text-gold-800 border border-gold-200 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[22px]">speed</span>
+                </div>
+                <div>
+                  <span class="text-xs text-secondary font-medium">Avg. Turnaround</span>
+                  <span class="font-display-lg text-2xl font-bold text-on-surface block mt-0.5">1.8 Days</span>
+                </div>
+              </div>
+              <span class="px-2 py-0.5 rounded-full badge-gold text-[10px] font-semibold">
+                On Target
+              </span>
+            </div>
+
+            <div class="bg-surface-container-lowest rounded-xl p-space-md border border-surface-container-high shadow-xs flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[22px]">fact_check</span>
+                </div>
+                <div>
+                  <span class="text-xs text-secondary font-medium">Evaluated This Term</span>
+                  <span class="font-display-lg text-2xl font-bold text-on-surface block mt-0.5">38</span>
+                </div>
+              </div>
+              <span class="px-2 py-0.5 rounded-full badge-approved text-[10px] font-semibold">
+                92% Completed
+              </span>
+            </div>
+
+          </div>
+
+          <!-- Submission Review Queue Table with Search & Filters -->
+          <div class="bg-surface-container-lowest rounded-xl border border-surface-container-high p-space-md shadow-xs flex flex-col gap-space-md">
+            
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h2 class="font-headline-lg text-base font-bold text-on-surface">Student Submission Queue</h2>
+                <p class="font-body-sm text-xs text-on-surface-variant">Review code artifacts, evaluate rubrics, and publish feedback.</p>
+              </div>
+
+              <!-- Filter Controls -->
+              <div class="flex items-center gap-2 flex-wrap">
+                <div class="relative flex items-center">
+                  <span class="material-symbols-outlined absolute left-2.5 text-outline text-[16px]">search</span>
+                  <input id="teacher-search-input" oninput="filterTeacherSubmissions()" type="text" placeholder="Search student or roll no..." class="pl-8 pr-3 py-1.5 bg-surface-container-low border border-surface-container-high rounded-lg text-xs text-on-surface focus:outline-none focus:border-primary w-48"/>
+                </div>
+                <select id="teacher-subject-select" onchange="filterTeacherSubmissions()" class="px-2.5 py-1.5 bg-surface-container-low border border-surface-container-high rounded-lg text-xs text-on-surface focus:outline-none focus:border-primary font-semibold">
+                  <option value="ALL">All Courses</option>
+                  <option value="CS-601">CS-601: Computer Networks</option>
+                  <option value="CS-602">CS-602: Cloud Architectures</option>
+                  <option value="CS-603">CS-603: Distributed Systems</option>
+                </select>
+                <select id="teacher-status-select" onchange="filterTeacherSubmissions()" class="px-2.5 py-1.5 bg-surface-container-low border border-surface-container-high rounded-lg text-xs text-on-surface focus:outline-none focus:border-primary font-semibold">
+                  <option value="ALL">All Statuses</option>
+                  <option value="Pending Review">Pending Review</option>
+                  <option value="Needs Revision">Needs Revision</option>
+                  <option value="Approved">Approved</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs" id="teacher-submissions-table">
+                <thead>
+                  <tr class="border-b border-surface-container-high bg-surface-container-low text-secondary font-semibold">
+                    <th class="p-2.5">Student</th>
+                    <th class="p-2.5">Course</th>
+                    <th class="p-2.5">Assignment</th>
+                    <th class="p-2.5">Version</th>
+                    <th class="p-2.5">Submitted</th>
+                    <th class="p-2.5">Status</th>
+                    <th class="p-2.5 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-surface-container-high" id="teacher-table-body">
+                  ${state.submissions.map(sub => `
+                    <tr class="hover:bg-surface-container-low transition-colors">
+                      <td class="p-2.5">
+                        <div class="flex items-center gap-2">
+                          <div class="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-[10px]">
+                            ${sub.studentName.split(' ').map(n=>n[0]).join('')}
+                          </div>
+                          <div>
+                            <span class="font-bold text-on-surface block leading-tight">${sub.studentName}</span>
+                            <span class="text-[10px] text-secondary font-mono">${sub.studentRoll}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="p-2.5 font-bold text-primary">${sub.subjectCode}</td>
+                      <td class="p-2.5 font-medium text-on-surface">${sub.title}</td>
+                      <td class="p-2.5 font-mono text-[11px]">${sub.version}</td>
+                      <td class="p-2.5 text-secondary">${sub.uploadTime}</td>
+                      <td class="p-2.5">
+                        <span class="px-2 py-0.5 rounded-full font-semibold text-[10px] ${
+                          sub.status === 'Approved' ? 'badge-approved' :
+                          sub.status === 'Needs Revision' ? 'badge-revision' : 'badge-gold'
+                        }">
+                          ${sub.status}
+                        </span>
+                      </td>
+                      <td class="p-2.5 text-right">
+                        <button onclick="openTeacherReview('${sub.id}')" class="px-3 py-1 bg-primary hover:bg-maroon-700 text-on-primary font-bold rounded text-[11px] transition-colors shadow-2xs">
+                          Evaluate
+                        </button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+        </div>
+      `;
+    }
+
+    function filterTeacherSubmissions() {
+      const search = (document.getElementById("teacher-search-input")?.value || "").toLowerCase();
+      const course = document.getElementById("teacher-subject-select")?.value || "ALL";
+      const status = document.getElementById("teacher-status-select")?.value || "ALL";
+
+      const filtered = state.submissions.filter(sub => {
+        const matchesSearch = sub.studentName.toLowerCase().includes(search) || sub.studentRoll.toLowerCase().includes(search) || sub.title.toLowerCase().includes(search);
+        const matchesCourse = course === "ALL" || sub.subjectCode === course;
+        const matchesStatus = status === "ALL" || sub.status === status;
+        return matchesSearch && matchesCourse && matchesStatus;
+      });
+
+      const tbody = document.getElementById("teacher-table-body");
+      if (!tbody) return;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-secondary">No submissions matching current filter criteria.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(sub => `
+        <tr class="hover:bg-surface-container-low transition-colors">
+          <td class="p-2.5">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-[10px]">
+                ${sub.studentName.split(' ').map(n=>n[0]).join('')}
+              </div>
+              <div>
+                <span class="font-bold text-on-surface block leading-tight">${sub.studentName}</span>
+                <span class="text-[10px] text-secondary font-mono">${sub.studentRoll}</span>
+              </div>
+            </div>
+          </td>
+          <td class="p-2.5 font-bold text-primary">${sub.subjectCode}</td>
+          <td class="p-2.5 font-medium text-on-surface">${sub.title}</td>
+          <td class="p-2.5 font-mono text-[11px]">${sub.version}</td>
+          <td class="p-2.5 text-secondary">${sub.uploadTime}</td>
+          <td class="p-2.5">
+            <span class="px-2 py-0.5 rounded-full font-semibold text-[10px] ${
+              sub.status === 'Approved' ? 'badge-approved' :
+              sub.status === 'Needs Revision' ? 'badge-revision' : 'badge-gold'
+            }">
+              ${sub.status}
+            </span>
+          </td>
+          <td class="p-2.5 text-right">
+            <button onclick="openTeacherReview('${sub.id}')" class="px-3 py-1 bg-primary hover:bg-maroon-700 text-on-primary font-bold rounded text-[11px] transition-colors shadow-2xs">
+              Evaluate
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    let activeReviewSubId = null;
+
+    function openTeacherReview(subId) {
+      activeReviewSubId = subId;
+      window.location.hash = "#/teacher-review";
+    }
+
+    // =========================================================================
+    // 7. TEACHER REVIEW & GRADING WORKSPACE (Code Inspection, Rubric, Actions)
+    // =========================================================================
+    function renderTeacherReviewPage() {
+      // Find submission by ID or fallback to Alex Chen's submission
+      const sub = state.submissions.find(s => s.id === activeReviewSubId) || state.submissions[0];
+
+      return `
+        <div class="flex flex-col w-full gap-space-lg">
+          
+          <!-- Top Control & Breadcrumb Bar -->
+          <div class="w-full bg-surface-container-lowest rounded-xl p-space-md border border-surface-container-high shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div class="flex flex-col gap-1">
+              <nav class="flex items-center gap-1.5 text-xs text-secondary font-medium">
+                <a href="#/teacher-dashboard" class="hover:text-primary transition-colors flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[15px]">supervisor_account</span>
+                  <span>Teacher Portal</span>
+                </a>
+                <span class="text-outline">/</span>
+                <span>${sub.subjectCode}</span>
+                <span class="text-outline">/</span>
+                <span class="text-primary font-semibold">${sub.studentName} (${sub.studentRoll})</span>
+              </nav>
+              <div class="flex items-center gap-2 flex-wrap mt-0.5">
+                <h1 class="font-headline-lg text-lg font-bold text-on-surface tracking-tight">${sub.title}</h1>
+                <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] ${
+                  sub.status === 'Approved' ? 'badge-approved' :
+                  sub.status === 'Needs Revision' ? 'badge-revision' : 'badge-gold'
+                }">
+                  ${sub.status}
+                </span>
+                <span class="text-[11px] text-secondary font-medium">
+                  Submitted ${sub.uploadTime}
+                </span>
+              </div>
+            </div>
+
+            <!-- Student Navigation Stepper -->
+            <div class="flex items-center gap-2 self-start md:self-auto">
+              <div class="flex items-center bg-surface-container-low rounded-lg p-1 border border-surface-container-high text-xs">
+                <button onclick="navigateStudentReview(-1)" class="p-1 rounded hover:bg-surface-container text-secondary">
+                  <span class="material-symbols-outlined text-[16px]">chevron_left</span>
+                </button>
+                <span class="px-2 font-semibold text-on-surface">Submission ${state.submissions.indexOf(sub) + 1} of ${state.submissions.length}</span>
+                <button onclick="navigateStudentReview(1)" class="p-1 rounded hover:bg-surface-container text-secondary">
+                  <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dual-Pane Workspace (Artifact Preview vs Grading Form) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+            
+            <!-- LEFT PANE: Artifact Inspection (7 Cols) -->
+            <section class="lg:col-span-7 flex flex-col gap-space-md">
+              
+              <!-- File Details Card -->
+              <div class="bg-surface-container-lowest rounded-xl p-space-md border border-surface-container-high shadow-xs">
+                <div class="flex items-center justify-between pb-3 border-b border-surface-container-high">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-primary text-on-primary flex items-center justify-center">
+                      <span class="material-symbols-outlined text-[24px]">folder_zip</span>
+                    </div>
+                    <div>
+                      <span class="font-bold text-sm text-on-surface block">${sub.fileName}</span>
+                      <span class="text-xs text-secondary">${sub.fileSize} • S3 Verified Archive</span>
+                    </div>
+                  </div>
+                  <button onclick="simulateFileDownload('${sub.fileName}')" class="px-3 py-1.5 bg-surface-container hover:bg-primary hover:text-white rounded-lg text-xs font-semibold text-primary transition-colors flex items-center gap-1 border border-surface-container-high">
+                    <span class="material-symbols-outlined text-[16px]">download</span>
+                    <span>Download</span>
+                  </button>
+                </div>
+
+                <div class="mt-3 flex items-center justify-between text-[11px] text-secondary font-mono bg-surface-container-low p-2 rounded border border-surface-container-high">
+                  <span>S3: ${sub.s3Key}</span>
+                  <span class="text-emerald-700 font-bold">SHA-256 Valid</span>
+                </div>
+
+                ${sub.comment ? `
+                  <div class="mt-3 p-3 bg-surface-container-low rounded-lg border border-surface-container-high text-xs">
+                    <span class="font-bold text-primary block mb-0.5">Student Submission Note:</span>
+                    <p class="text-secondary leading-relaxed">${sub.comment}</p>
+                  </div>
+                ` : ''}
+              </div>
+
+              <!-- Interactive Source Code Preview -->
+              <div class="bg-surface-container-lowest rounded-xl border border-surface-container-high shadow-xs overflow-hidden">
+                <div class="h-10 bg-surface-container-low px-4 flex items-center justify-between border-b border-surface-container-high">
+                  <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-outline text-[16px]">code</span>
+                    <span class="font-mono text-xs font-semibold text-on-surface">server_socket_echo.py</span>
+                  </div>
+                  <span class="text-[10px] text-secondary font-mono">Python 3.10 • 186 LOC</span>
+                </div>
+                <div class="p-4 bg-[#1a1214] text-white font-mono text-xs overflow-x-auto custom-scroll leading-relaxed">
+<pre><span class="text-gold-300">import</span> socket
+<span class="text-gold-300">import</span> threading
+<span class="text-gold-300">import</span> logging
+
+logging.basicConfig(level=logging.INFO)
+
+<span class="text-gold-300">class</span> <span class="text-emerald-400">StreamEchoServer</span>:
+    <span class="text-gold-300">def</span> <span class="text-blue-300">__init__</span>(self, host: str = <span class="text-amber-300">'0.0.0.0'</span>, port: int = <span class="text-purple-300">8080</span>):
+        self.host = host
+        self.port = port
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, <span class="text-purple-300">1</span>)
+
+    <span class="text-gold-300">def</span> <span class="text-blue-300">handle_client</span>(self, client_sock: socket.socket, addr):
+        <span class="text-gray-400"># Robust framing protocol implementation</span>
+        <span class="text-gold-300">with</span> client_sock:
+            <span class="text-gold-300">while</span> <span class="text-purple-300">True</span>:
+                data = client_sock.recv(<span class="text-purple-300">4096</span>)
+                <span class="text-gold-300">if</span> <span class="text-gold-300">not</span> data:
+                    <span class="text-gold-300">break</span>
+                client_sock.sendall(data)
+        logging.info(<span class="text-amber-300">f"Client disconnected: {addr}"</span>)
+</pre>
+                </div>
+              </div>
+
+            </section>
+
+            <!-- RIGHT PANE: Interactive Grading & Rubric (5 Cols) -->
+            <aside class="lg:col-span-5 flex flex-col gap-space-md">
+              
+              <div class="bg-surface-container-lowest rounded-xl p-space-lg border border-surface-container-high shadow-xs flex flex-col gap-4">
+                <div class="flex items-center justify-between pb-3 border-b border-surface-container-high">
+                  <h2 class="font-headline-sm text-base font-bold text-on-surface">Grading & Evaluation Rubric</h2>
+                  <div class="flex items-center gap-1">
+                    <span class="text-xs text-secondary font-semibold">Total:</span>
+                    <span id="calculated-total-score" class="font-display-lg text-lg font-bold text-primary">85</span>
+                    <span class="text-xs text-secondary">/ 100</span>
+                  </div>
+                </div>
+
+                <!-- Rubric Interactive Sliders -->
+                <div class="flex flex-col gap-3.5 text-xs">
+                  <div>
+                    <div class="flex justify-between font-semibold mb-1">
+                      <span>Correctness (Max 30)</span>
+                      <span id="score-val-correctness" class="font-mono text-primary font-bold">26 pts</span>
+                    </div>
+                    <input id="score-slider-correctness" oninput="updateCalculatedScore()" type="range" min="0" max="30" value="26" class="w-full accent-primary cursor-pointer"/>
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between font-semibold mb-1">
+                      <span>Code Quality & Modularity (Max 20)</span>
+                      <span id="score-val-modularity" class="font-mono text-primary font-bold">19 pts</span>
+                    </div>
+                    <input id="score-slider-modularity" oninput="updateCalculatedScore()" type="range" min="0" max="20" value="19" class="w-full accent-primary cursor-pointer"/>
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between font-semibold mb-1">
+                      <span>Automated Test Coverage (Max 25)</span>
+                      <span id="score-val-tests" class="font-mono text-primary font-bold">25 pts</span>
+                    </div>
+                    <input id="score-slider-tests" oninput="updateCalculatedScore()" type="range" min="0" max="25" value="25" class="w-full accent-primary cursor-pointer"/>
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between font-semibold mb-1">
+                      <span>Documentation & Clarity (Max 25)</span>
+                      <span id="score-val-docs" class="font-mono text-primary font-bold">15 pts</span>
+                    </div>
+                    <input id="score-slider-docs" oninput="updateCalculatedScore()" type="range" min="0" max="25" value="15" class="w-full accent-primary cursor-pointer"/>
+                  </div>
+                </div>
+
+                <!-- Teacher Feedback Textarea -->
+                <div class="flex flex-col gap-1.5 pt-2 border-t border-surface-container-high">
+                  <label for="teacher-review-feedback" class="font-label-md text-xs font-semibold text-on-surface">
+                    Faculty Feedback to Student
+                  </label>
+                  <textarea id="teacher-review-feedback" rows="4" class="w-full p-3 bg-surface-container-low border border-surface-container-high rounded-lg text-xs text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary leading-relaxed" placeholder="Write detailed feedback for the student...">${sub.feedback || "Good socket architecture. Addressed the edge case gracefully. Verified on Ubuntu 22.04 LTS."}</textarea>
+                </div>
+
+                <!-- Action Buttons: "Request Changes" vs "Approve" -->
+                <div class="flex flex-col sm:flex-row gap-2 pt-2">
+                  <button type="button" onclick="performTeacherReviewAction('revision', '${sub.id}')" class="flex-1 py-2.5 px-3 bg-surface-container hover:bg-error-container hover:text-on-error-container border border-surface-container-high text-error font-bold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5">
+                    <span class="material-symbols-outlined text-[17px]">assignment_late</span>
+                    <span>Request Changes</span>
+                  </button>
+
+                  <button type="button" onclick="performTeacherReviewAction('approve', '${sub.id}')" class="flex-1 py-2.5 px-3 bg-primary hover:bg-maroon-700 active:bg-maroon-900 text-on-primary font-bold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-sm">
+                    <span class="material-symbols-outlined text-[17px]">task_alt</span>
+                    <span>Approve & Record</span>
+                  </button>
+                </div>
+
+                <span class="text-[10px] text-secondary text-center block">
+                  Action immediately updates student grade transcript and notifies student.
+                </span>
+              </div>
+
+            </aside>
+
+          </div>
+
+        </div>
+      `;
+    }
+
+    function updateCalculatedScore() {
+      const c = parseInt(document.getElementById("score-slider-correctness")?.value || 0);
+      const m = parseInt(document.getElementById("score-slider-modularity")?.value || 0);
+      const t = parseInt(document.getElementById("score-slider-tests")?.value || 0);
+      const d = parseInt(document.getElementById("score-slider-docs")?.value || 0);
+
+      document.getElementById("score-val-correctness").textContent = c + " pts";
+      document.getElementById("score-val-modularity").textContent = m + " pts";
+      document.getElementById("score-val-tests").textContent = t + " pts";
+      document.getElementById("score-val-docs").textContent = d + " pts";
+
+      const total = c + m + t + d;
+      const totalEl = document.getElementById("calculated-total-score");
+      if (totalEl) totalEl.textContent = total;
+    }
+
+    function navigateStudentReview(offset) {
+      const currentIndex = state.submissions.findIndex(s => s.id === (activeReviewSubId || state.submissions[0].id));
+      let nextIndex = currentIndex + offset;
+      if (nextIndex < 0) nextIndex = state.submissions.length - 1;
+      if (nextIndex >= state.submissions.length) nextIndex = 0;
+      activeReviewSubId = state.submissions[nextIndex].id;
+      renderCurrentView();
+    }
+
+    function performTeacherReviewAction(action, subId) {
+      const sub = state.submissions.find(s => s.id === subId);
+      if (!sub) return;
+
+      const feedback = document.getElementById("teacher-review-feedback")?.value || "";
+      const totalScore = parseInt(document.getElementById("calculated-total-score")?.textContent || "85");
+
+      if (action === "revision") {
+        sub.status = "Needs Revision";
+        sub.feedback = feedback || "Changes requested by instructor. Please review requirements and resubmit.";
+        showToast(`Requested changes for ${sub.studentName} (${sub.studentRoll}).`, "warning");
+      } else {
+        sub.status = "Approved";
+        sub.feedback = feedback || "Submission approved with full credit.";
+        sub.score = totalScore;
+        showToast(`Approved submission for ${sub.studentName} with score ${totalScore}/100!`, "success");
+      }
+
+      saveState(state);
+      updateShellHeader();
+      renderCurrentView();
+    }
+  </script>
+</body>
+</html>
