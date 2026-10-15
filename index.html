@@ -350,10 +350,10 @@
       </div>
 
       <div class="flex items-center gap-3">
-        <!-- AWS Simulation Badge Indicator -->
-        <div class="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container text-secondary text-[11px] font-medium border border-surface-container-high" title="Frontend prototype with mock AWS S3 and Cognito flow">
-          <span class="w-2 h-2 rounded-full bg-gold animate-pulse"></span>
-          <span>Mock AWS Sandbox</span>
+        <!-- AWS / Backend Storage Badge Indicator -->
+        <div id="backend-storage-badge" class="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gold-50 text-gold-900 text-[11px] font-medium border border-gold-300" title="DynamoDB persistence status">
+          <span id="backend-storage-dot" class="w-2 h-2 rounded-full bg-gold-600 animate-pulse"></span>
+          <span id="backend-storage-label">Checking Backend...</span>
         </div>
 
         <!-- Notification Bell with Dropdown -->
@@ -685,6 +685,83 @@
     }
 
     let state = getStoredState();
+    let backendSyncActive = false;
+
+    // Backend API Client with Role & User Identity Headers
+    async function apiFetch(endpoint, options = {}) {
+      const isStudent = state.currentUser.role === "student";
+      const userId = isStudent ? state.currentUser.student.id : state.currentUser.teacher.id;
+      const headers = Object.assign({
+        "Content-Type": "application/json",
+        "x-user-id": userId,
+        "x-user-role": state.currentUser.role
+      }, options.headers || {});
+
+      const res = await fetch(endpoint, Object.assign({}, options, { headers }));
+      if (!res.ok) {
+        const errorBody = await res.json().catch(() => ({ message: res.statusText }));
+        throw new Error(errorBody.message || errorBody.error || `HTTP error ${res.status}`);
+      }
+      return res.json();
+    }
+
+    function updateBackendStorageIndicator(mode, online) {
+      const badge = document.getElementById("backend-storage-badge");
+      const label = document.getElementById("backend-storage-label");
+      const dot = document.getElementById("backend-storage-dot");
+      if (!badge || !label) return;
+
+      badge.classList.remove("hidden");
+      if (!online) {
+        label.textContent = "Offline Fallback";
+        badge.className = "hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-50 text-rose-800 text-[11px] font-medium border border-rose-200";
+        if (dot) dot.className = "w-2 h-2 rounded-full bg-rose-500";
+      } else if (mode === "aws") {
+        label.textContent = "AWS DynamoDB Active";
+        badge.className = "hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-medium border border-emerald-200";
+        if (dot) dot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+      } else {
+        label.textContent = "DynamoDB (Local Mock DB)";
+        badge.className = "hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gold-50 text-gold-900 text-[11px] font-medium border border-gold-300";
+        if (dot) dot.className = "w-2 h-2 rounded-full bg-gold-600 animate-pulse";
+      }
+    }
+
+    async function syncStateFromBackend() {
+      if (backendSyncActive) return;
+      backendSyncActive = true;
+      try {
+        const health = await apiFetch("/api/health");
+        updateBackendStorageIndicator(health.storageMode, true);
+
+        // Fetch subjects
+        const subjects = await apiFetch("/api/subjects");
+        if (Array.isArray(subjects) && subjects.length > 0) {
+          state.subjects = subjects;
+        }
+
+        // Fetch assignments
+        const assignments = await apiFetch("/api/assignments");
+        if (Array.isArray(assignments) && assignments.length > 0) {
+          state.assignments = assignments;
+        }
+
+        // Fetch submissions (role-enforced by backend)
+        const submissions = await apiFetch("/api/submissions");
+        if (Array.isArray(submissions)) {
+          state.submissions = submissions;
+        }
+
+        saveState(state);
+        updateShellHeader();
+        renderCurrentView();
+      } catch (err) {
+        console.warn("Backend sync failed, using cached state:", err);
+        updateBackendStorageIndicator("offline", false);
+      } finally {
+        backendSyncActive = false;
+      }
+    }
 
     // Show Toast Notification
     function showToast(message, type = "success") {
@@ -716,7 +793,7 @@
     }
 
     // Role Toggling between Student and Teacher
-    function toggleActiveRole() {
+    async function toggleActiveRole() {
       if (state.currentUser.role === "student") {
         state.currentUser.role = "teacher";
         state.currentView = "teacher-dashboard";
@@ -731,6 +808,7 @@
       saveState(state);
       updateShellHeader();
       renderCurrentView();
+      await syncStateFromBackend();
     }
 
     function setRole(role) {
@@ -855,7 +933,10 @@
     }
 
     window.addEventListener("hashchange", handleRouting);
-    window.addEventListener("DOMContentLoaded", handleRouting);
+    window.addEventListener("DOMContentLoaded", () => {
+      handleRouting();
+      syncStateFromBackend();
+    });
 
     function renderCurrentView() {
       const container = document.getElementById("view-container");
@@ -1099,13 +1180,14 @@
       showToast(`Selected ${role === 'student' ? 'Alex Chen (Student)' : 'Dr. Evelyn Reed (Teacher)'}`, "info");
     }
 
-    function handleLoginFormSubmit(e) {
+    async function handleLoginFormSubmit(e) {
       e.preventDefault();
       const isTeacher = activeLoginTab === "teacher";
       state.currentUser.role = isTeacher ? "teacher" : "student";
       saveState(state);
       showToast(`Welcome back, ${isTeacher ? 'Dr. Evelyn Reed' : 'Alex Chen'}!`, "success");
       window.location.hash = isTeacher ? "#/teacher-dashboard" : "#/student-dashboard";
+      await syncStateFromBackend();
     }
 
     function initLoginScripts() {
@@ -1791,15 +1873,18 @@
       if (card) card.classList.add("hidden");
     }
 
-    function submitAssignmentWork() {
+    async function submitAssignmentWork() {
       const btn = document.getElementById("submit-assignment-btn");
       const commentInput = document.getElementById("submission-comment");
       const comment = commentInput ? commentInput.value.trim() : "";
       
       const fileName = selectedUploadFile ? selectedUploadFile.name : "alex_chen_cs2023084_asg3.zip";
       const fileSize = selectedUploadFile ? (selectedUploadFile.size / (1024 * 1024)).toFixed(1) + " MB" : "3.4 MB";
+      const versionEl = document.querySelector('input[name="sub-version"]:checked');
+      const version = versionEl ? versionEl.value : "v1.0";
+      const assignmentId = "asg-3";
 
-      // Animate simulated S3 progress
+      // Animate S3 upload and persistence progress
       const progressWrapper = document.getElementById("upload-progress-wrapper");
       const progressBar = document.getElementById("upload-progress-bar");
       const progressText = document.getElementById("upload-progress-text");
@@ -1810,50 +1895,82 @@
         btn.classList.add("opacity-70", "cursor-not-allowed");
       }
 
-      let pct = 0;
-      const interval = setInterval(() => {
-        pct += 25;
-        if (progressBar) progressBar.style.width = pct + "%";
-        if (progressText) progressText.textContent = `Streaming chunks to S3: ${pct}%`;
+      try {
+        if (progressBar) progressBar.style.width = "25%";
+        if (progressText) progressText.textContent = "Requesting S3 Pre-Signed Upload URL...";
 
-        if (pct >= 100) {
-          clearInterval(interval);
-          setTimeout(() => {
-            // Add new submission record to state
-            const newSub = {
-              id: "sub-" + Date.now(),
-              studentId: "CS-2023-084",
-              studentName: "Alex Chen",
-              studentRoll: "CS-2023-084",
-              assignmentId: "asg-3",
-              subjectCode: "CS-601",
-              title: "Assignment 3: TCP/UDP Socket Implementation",
-              version: "v1.1",
-              fileName: fileName,
-              fileSize: fileSize,
-              uploadTime: "Just now",
-              status: "Pending Review",
-              s3Key: `s3://student-drive-assignments-dyp-dpu/cs-601/cs-2023-084/${fileName}`,
-              comment: comment || "Student updated assignment files with full test suite.",
-              scores: { correctness: 28, modularity: 20, tests: 24, docs: 15 },
-              feedback: ""
-            };
+        // 1. Get presigned upload URL from backend
+        const presign = await apiFetch("/api/uploads/presign", {
+          method: "POST",
+          body: JSON.stringify({
+            fileName: fileName,
+            fileSize: fileSize,
+            contentType: selectedUploadFile ? selectedUploadFile.type : "application/zip",
+            assignmentId: assignmentId
+          })
+        });
 
-            state.submissions.unshift(newSub);
-            saveState(state);
-            showToast("Assignment uploaded successfully to DYP DPU Student Drive!", "success");
-            window.location.hash = "#/student-submission";
-          }, 400);
+        if (progressBar) progressBar.style.width = "60%";
+        if (progressText) progressText.textContent = "Uploading encrypted package to private S3 bucket...";
+
+        // 2. Upload file content to S3 (or mock S3 endpoint)
+        const uploadPayload = selectedUploadFile || new Blob(["Student assignment binary data"], { type: "application/zip" });
+        await fetch(presign.uploadUrl, {
+          method: presign.method || "PUT",
+          body: uploadPayload,
+          headers: presign.headers || { "Content-Type": "application/octet-stream" }
+        });
+
+        if (progressBar) progressBar.style.width = "85%";
+        if (progressText) progressText.textContent = "Recording S3 key & metadata into DynamoDB...";
+
+        // 3. Create submission record in database (only S3 key & metadata stored)
+        const createdSub = await apiFetch("/api/submissions", {
+          method: "POST",
+          body: JSON.stringify({
+            assignmentId: assignmentId,
+            fileName: fileName,
+            fileSize: fileSize,
+            s3Key: presign.s3Key,
+            comment: comment || "Student updated assignment files with test suite.",
+            version: version
+          })
+        });
+
+        if (progressBar) progressBar.style.width = "100%";
+        if (progressText) progressText.textContent = "Upload verified & saved in persistent store!";
+
+        // Prepend to local submissions state
+        state.submissions.unshift(createdSub);
+        activeStudentSubId = createdSub.id;
+        saveState(state);
+
+        showToast("Submission successfully stored in DynamoDB & S3!", "success");
+        setTimeout(() => {
+          window.location.hash = "#/student-submission";
+        }, 500);
+
+      } catch (err) {
+        console.error("Submission failed:", err);
+        showToast("Upload failed: " + err.message, "warning");
+        if (progressText) progressText.textContent = "Upload failed: " + err.message;
+        if (btn) {
+          btn.disabled = false;
+          btn.classList.remove("opacity-70", "cursor-not-allowed");
         }
-      }, 200);
+      }
     }
 
     // =========================================================================
     // 5. STUDENT SUBMISSION DETAILS (Timeline, Teacher Feedback, Rubric)
     // =========================================================================
+    let activeStudentSubId = null;
+
     function renderStudentSubmissionDetails() {
-      const sub = state.submissions.find(s => s.assignmentId === "asg-2") || state.submissions[0];
-      const asg = state.assignments.find(a => a.id === "asg-2") || state.assignments[0];
+      const currentRoll = state.currentUser.student?.id || "CS-2023-084";
+      const studentSubs = state.submissions.filter(s => s.studentRoll === currentRoll || s.studentId === currentRoll);
+      const sub = (activeStudentSubId ? state.submissions.find(s => s.id === activeStudentSubId) : null) || studentSubs[0] || state.submissions[0];
+      const asg = (sub ? state.assignments.find(a => a.id === sub.assignmentId) : null) || state.assignments[0];
 
       return `
         <div class="flex flex-col w-full gap-space-lg">
@@ -1968,44 +2085,44 @@
               <div class="bg-surface-container-lowest rounded-xl p-space-lg border border-surface-container-high shadow-xs flex flex-col gap-3">
                 <div class="flex items-center justify-between pb-2 border-b border-surface-container-high">
                   <h3 class="font-bold text-xs text-on-surface">Criterion Scoring Breakdown</h3>
-                  <span class="font-bold text-xs text-primary">Score: 77 / 100</span>
+                  <span class="font-bold text-xs text-primary">Score: ${sub.score || sub.scores?.total || 77} / 100</span>
                 </div>
 
                 <div class="flex flex-col gap-3 text-xs">
                   <div>
                     <div class="flex justify-between text-secondary mb-1">
                       <span>Algorithm Correctness</span>
-                      <span class="font-bold text-on-surface">24 / 30 pts</span>
+                      <span class="font-bold text-on-surface">${sub.scores?.correctness || 24} / 30 pts</span>
                     </div>
                     <div class="w-full bg-surface-container-high rounded-full h-2 overflow-hidden">
-                      <div class="bg-primary h-full rounded-full" style="width: 80%"></div>
+                      <div class="bg-primary h-full rounded-full" style="width: ${((sub.scores?.correctness || 24)/30)*100}%"></div>
                     </div>
                   </div>
                   <div>
                     <div class="flex justify-between text-secondary mb-1">
                       <span>Code Quality & Modularity</span>
-                      <span class="font-bold text-on-surface">20 / 20 pts</span>
+                      <span class="font-bold text-on-surface">${sub.scores?.modularity || 20} / 20 pts</span>
                     </div>
                     <div class="w-full bg-surface-container-high rounded-full h-2 overflow-hidden">
-                      <div class="bg-emerald-600 h-full rounded-full" style="width: 100%"></div>
+                      <div class="bg-emerald-600 h-full rounded-full" style="width: ${((sub.scores?.modularity || 20)/20)*100}%"></div>
                     </div>
                   </div>
                   <div>
                     <div class="flex justify-between text-secondary mb-1">
                       <span>Automated Test Suite</span>
-                      <span class="font-bold text-on-surface">18 / 25 pts</span>
+                      <span class="font-bold text-on-surface">${sub.scores?.tests || 18} / 25 pts</span>
                     </div>
                     <div class="w-full bg-surface-container-high rounded-full h-2 overflow-hidden">
-                      <div class="bg-gold h-full rounded-full" style="width: 72%"></div>
+                      <div class="bg-gold h-full rounded-full" style="width: ${((sub.scores?.tests || 18)/25)*100}%"></div>
                     </div>
                   </div>
                   <div>
                     <div class="flex justify-between text-secondary mb-1">
                       <span>Documentation & Analysis</span>
-                      <span class="font-bold text-on-surface">15 / 15 pts</span>
+                      <span class="font-bold text-on-surface">${sub.scores?.docs || 15} / 15 pts</span>
                     </div>
                     <div class="w-full bg-surface-container-high rounded-full h-2 overflow-hidden">
-                      <div class="bg-emerald-600 h-full rounded-full" style="width: 100%"></div>
+                      <div class="bg-emerald-600 h-full rounded-full" style="width: ${((sub.scores?.docs || 15)/15)*100}%"></div>
                     </div>
                   </div>
                 </div>
@@ -2046,23 +2163,18 @@
                 <span class="font-bold text-xs text-on-surface pb-2 border-b border-surface-container-high">Submission Revision Log</span>
                 
                 <div class="relative pl-4 border-l-2 border-primary flex flex-col gap-4 text-xs">
-                  <div class="relative">
-                    <span class="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-primary ring-4 ring-white"></span>
-                    <div class="flex items-center justify-between">
-                      <span class="font-bold text-on-surface">Revision v1.1</span>
-                      <span class="text-[10px] text-secondary">Oct 24 • 10:30 AM</span>
+                  ${(sub.revisions && sub.revisions.length > 0 ? sub.revisions : [
+                    { version: sub.version || 'v1.0', timestamp: sub.uploadTime || 'Oct 23, 2024', comment: sub.comment || 'Initial submission archive.' }
+                  ]).map((rev, idx) => `
+                    <div class="relative">
+                      <span class="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full ${idx === 0 ? 'bg-primary' : 'bg-outline-variant'} ring-4 ring-white"></span>
+                      <div class="flex items-center justify-between">
+                        <span class="font-bold text-on-surface">Revision ${rev.version}</span>
+                        <span class="text-[10px] text-secondary">${rev.timestamp}</span>
+                      </div>
+                      <p class="text-[11px] text-secondary mt-0.5">${rev.comment || 'Artifact package recorded.'}</p>
                     </div>
-                    <p class="text-[11px] text-secondary mt-0.5">Updated poison reverse flag and routing loop suppression.</p>
-                  </div>
-
-                  <div class="relative">
-                    <span class="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-outline-variant ring-4 ring-white"></span>
-                    <div class="flex items-center justify-between">
-                      <span class="font-bold text-on-surface">Initial Submission v1.0</span>
-                      <span class="text-[10px] text-secondary">Oct 22 • 10:14 PM</span>
-                    </div>
-                    <p class="text-[11px] text-secondary mt-0.5">Distance vector graph topology simulation script.</p>
-                  </div>
+                  `).join('')}
                 </div>
               </div>
 
@@ -2562,27 +2674,60 @@ logging.basicConfig(level=logging.INFO)
       renderCurrentView();
     }
 
-    function performTeacherReviewAction(action, subId) {
+    async function performTeacherReviewAction(action, subId) {
       const sub = state.submissions.find(s => s.id === subId);
       if (!sub) return;
 
       const feedback = document.getElementById("teacher-review-feedback")?.value || "";
-      const totalScore = parseInt(document.getElementById("calculated-total-score")?.textContent || "85");
+      const c = parseInt(document.getElementById("score-slider-correctness")?.value || 26);
+      const m = parseInt(document.getElementById("score-slider-modularity")?.value || 19);
+      const t = parseInt(document.getElementById("score-slider-tests")?.value || 25);
+      const d = parseInt(document.getElementById("score-slider-docs")?.value || 15);
+      const totalScore = c + m + t + d;
 
+      // Optimistic local update
       if (action === "revision") {
         sub.status = "Needs Revision";
         sub.feedback = feedback || "Changes requested by instructor. Please review requirements and resubmit.";
-        showToast(`Requested changes for ${sub.studentName} (${sub.studentRoll}).`, "warning");
+        showToast(`Requesting revision for ${sub.studentName}...`, "info");
       } else {
         sub.status = "Approved";
         sub.feedback = feedback || "Submission approved with full credit.";
         sub.score = totalScore;
-        showToast(`Approved submission for ${sub.studentName} with score ${totalScore}/100!`, "success");
+        sub.scores = { correctness: c, modularity: m, tests: t, docs: d };
+        showToast(`Approving ${sub.studentName}'s submission...`, "info");
       }
-
       saveState(state);
       updateShellHeader();
       renderCurrentView();
+
+      // Persist to backend (DynamoDB)
+      try {
+        const updated = await apiFetch(`/api/submissions/${subId}/review`, {
+          method: "PATCH",
+          body: JSON.stringify({
+            action: action,
+            feedback: feedback,
+            scores: { correctness: c, modularity: m, tests: t, docs: d }
+          })
+        });
+
+        // Merge persisted record into local state
+        const idx = state.submissions.findIndex(s => s.id === subId);
+        if (idx !== -1) state.submissions[idx] = Object.assign({}, state.submissions[idx], updated);
+        saveState(state);
+
+        if (action === "revision") {
+          showToast(`Revision requested for ${sub.studentName} (${sub.studentRoll}) — saved to DynamoDB.`, "warning");
+        } else {
+          showToast(`Approved ${sub.studentName}'s submission (${totalScore}/100) — recorded in DynamoDB!`, "success");
+        }
+        updateShellHeader();
+        renderCurrentView();
+      } catch (err) {
+        console.error("Review persist failed:", err);
+        showToast("Review saved locally but DynamoDB sync failed: " + err.message, "warning");
+      }
     }
   </script>
 </body>

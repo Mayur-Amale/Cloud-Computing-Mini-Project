@@ -1,0 +1,370 @@
+module.exports = {
+  users: [
+    {
+      userId: "CS-2023-084",
+      role: "student",
+      name: "Alex Chen",
+      email: "alex.chen@student.dypdpu.edu",
+      department: "Computer Science & Engineering",
+      term: "Term 6 • B.Tech Computer Science & Engineering",
+      gpa: "3.84",
+      attendance: "94.2%",
+      credits: "92 / 120",
+      initials: "AC"
+    },
+    {
+      userId: "CS-2023-019",
+      role: "student",
+      name: "Priya Sharma",
+      email: "priya.sharma@student.dypdpu.edu",
+      department: "Computer Science & Engineering",
+      term: "Term 6 • B.Tech Computer Science & Engineering",
+      gpa: "3.91",
+      attendance: "96.5%",
+      credits: "94 / 120",
+      initials: "PS"
+    },
+    {
+      userId: "CS-2023-056",
+      role: "student",
+      name: "Rahul Patil",
+      email: "rahul.patil@student.dypdpu.edu",
+      department: "Computer Science & Engineering",
+      term: "Term 6 • B.Tech Computer Science & Engineering",
+      gpa: "3.72",
+      attendance: "91.8%",
+      credits: "90 / 120",
+      initials: "RP"
+    },
+    {
+      userId: "FAC-CSE-042",
+      role: "teacher",
+      name: "Dr. Evelyn Reed",
+      email: "evelyn.reed@faculty.dypdpu.edu",
+      title: "Associate Professor • Tenured",
+      department: "Dept. of Computer Science & Engineering",
+      officeHours: "Tue & Thu • 14:00 - 16:30 (Room 412B)",
+      activeCourses: 2,
+      enrolledStudents: 65,
+      initials: "ER"
+    },
+    {
+      userId: "FAC-CSE-018",
+      role: "teacher",
+      name: "Prof. David Vance",
+      email: "david.vance@faculty.dypdpu.edu",
+      title: "Assistant Professor",
+      department: "Dept. of Computer Science & Engineering",
+      officeHours: "Mon & Wed • 10:00 - 12:00 (Room 308A)",
+      activeCourses: 1,
+      enrolledStudents: 45,
+      initials: "DV"
+    }
+  ],
+
+  subjects: [
+    {
+      subjectCode: "CS-601",
+      name: "Computer Networks",
+      credits: 4.0,
+      section: "02A",
+      instructorId: "FAC-CSE-042",
+      instructorName: "Dr. Evelyn Reed",
+      room: "Engineering Hall 304 • MWF 10:00–11:15 AM",
+      description: "Fundamental principles and abstractions in packet switched internetworking, TCP/IP architecture, socket programming, flow and congestion control, interior routing protocols, and distributed packet inspection.",
+      status: "Active",
+      progress: 68
+    },
+    {
+      subjectCode: "CS-602",
+      name: "Cloud Computing Architectures",
+      credits: 3.5,
+      section: "01B",
+      instructorId: "FAC-CSE-018",
+      instructorName: "Prof. David Vance",
+      room: "Tech Center 202 • TTh 13:00–14:30 PM",
+      description: "Virtualization, distributed cloud primitives, AWS infrastructure simulation, serverless microservices, and storage tier optimization.",
+      status: "Active",
+      progress: 80
+    },
+    {
+      subjectCode: "CS-603",
+      name: "Distributed Systems",
+      credits: 4.0,
+      section: "02A",
+      instructorId: "FAC-CSE-042",
+      instructorName: "Dr. Evelyn Reed",
+      room: "Engineering Hall 102 • MW 14:00–15:30 PM",
+      description: "Consensus algorithms (Raft, Paxos), vector clocks, Byzantine fault tolerance, and distributed key-value storage designs.",
+      status: "Active",
+      progress: 75
+    },
+    {
+      subjectCode: "CS-604",
+      name: "Database Engine Internals",
+      credits: 3.0,
+      section: "01A",
+      instructorId: "FAC-CSE-018",
+      instructorName: "Prof. David Vance",
+      room: "Seminar Hall 4B • Fri 09:00–12:00 PM",
+      description: "B-Tree indexing, write-ahead logging (WAL), buffer pool managers, and concurrency control protocols.",
+      status: "Active",
+      progress: 88
+    },
+    {
+      subjectCode: "CS-605",
+      name: "Machine Learning & AI",
+      credits: 4.0,
+      section: "03C",
+      instructorId: "FAC-CSE-042",
+      instructorName: "Dr. Evelyn Reed",
+      room: "CS Lab 6 • MWF 11:30–12:45 PM",
+      description: "Statistical learning models, backpropagation, convolutional networks, and deep reinforcement learning.",
+      status: "Active",
+      progress: 92
+    }
+  ],
+
+  assignments: [
+    {
+      assignmentId: "asg-3",
+      subjectCode: "CS-601",
+      title: "Assignment 3: TCP/UDP Socket Implementation",
+      dueDate: "Oct 24, 2024 • 11:59 PM EST",
+      hoursRemaining: 28,
+      maxScore: 100,
+      attempt: "1 of 3 Allowed",
+      status: "Due Soon",
+      brief: "Implement a multi-threaded client-server echo application in Python 3.10+ supporting both TCP stream socket with framing and UDP datagram packet reassembly. Include robust timeout handling, unit tests, and performance benchmark comparison.",
+      requirements: [
+        "Socket programming in Python or C++ (RFC 793 / RFC 768)",
+        "Concurrent handling of at least 20 client streams via threading or async io",
+        "Comprehensive error handling for broken pipes & socket timeouts",
+        "Markdown documentation with wireshark packet capture analysis"
+      ],
+      createdBy: "FAC-CSE-042",
+      createdAt: "2024-10-15T10:00:00Z"
+    },
+    {
+      assignmentId: "asg-2",
+      subjectCode: "CS-601",
+      title: "Assignment 2: Distance Vector Routing Simulation",
+      dueDate: "Oct 25, 2024 • 11:59 PM EST",
+      hoursRemaining: 18,
+      maxScore: 100,
+      attempt: "2 of 3 Allowed",
+      status: "Needs Revision",
+      brief: "Simulate Bellman-Ford distance vector distributed convergence across a 6-node network graph with link-cost variations.",
+      requirements: [
+        "Bellman-Ford distributed routing algorithm implementation",
+        "Convergence detection under link failures",
+        "Split horizon with poison reverse loop suppression"
+      ],
+      createdBy: "FAC-CSE-042",
+      createdAt: "2024-10-08T10:00:00Z"
+    },
+    {
+      assignmentId: "asg-1",
+      subjectCode: "CS-601",
+      title: "Assignment 1: HTTP/1.1 vs HTTP/2 Wireshark Packet Analysis",
+      dueDate: "Oct 10, 2024 • 11:59 PM EST",
+      hoursRemaining: 0,
+      maxScore: 100,
+      status: "Approved",
+      brief: "Comparative latency and header compression study using Wireshark captures.",
+      requirements: [
+        "Packet capture trace analysis of TLS handshake",
+        "HPACK header compression benchmark",
+        "Stream multiplexing concurrency measurement"
+      ],
+      createdBy: "FAC-CSE-042",
+      createdAt: "2024-09-25T10:00:00Z"
+    },
+    {
+      assignmentId: "asg-4",
+      subjectCode: "CS-601",
+      title: "Assignment 4: BGP Inter-Domain Routing Study",
+      dueDate: "Nov 08, 2024 • 11:59 PM EST",
+      hoursRemaining: 240,
+      maxScore: 100,
+      status: "Upcoming",
+      brief: "Autonomous Systems peering, path-vector attribute filtering, and loop prevention.",
+      requirements: [
+        "eBGP and iBGP route exchange simulation",
+        "AS-Path loop prevention verification",
+        "Multi-exit discriminator (MED) metric evaluation"
+      ],
+      createdBy: "FAC-CSE-042",
+      createdAt: "2024-10-14T10:00:00Z"
+    },
+    {
+      assignmentId: "asg-raft",
+      subjectCode: "CS-603",
+      title: "Distributed Consensus Raft Implementation",
+      dueDate: "Oct 28, 2024 • 11:59 PM EST",
+      hoursRemaining: 96,
+      maxScore: 100,
+      status: "Pending Review",
+      brief: "Implement leader election and log replication with persistent state machine.",
+      requirements: [
+        "Heartbeat timer and election timeout randomization",
+        "Log matching invariant verification",
+        "Network partition resilience test suite"
+      ],
+      createdBy: "FAC-CSE-042",
+      createdAt: "2024-10-10T10:00:00Z"
+    },
+    {
+      assignmentId: "asg-cloud-1",
+      subjectCode: "CS-602",
+      title: "Cloud Virtualization Mini-Lab",
+      dueDate: "Oct 30, 2024 • 11:59 PM EST",
+      hoursRemaining: 140,
+      maxScore: 100,
+      status: "Pending Review",
+      brief: "Benchmark CPU, memory, and disk I/O virtualization overhead across KVM and Docker containers.",
+      requirements: [
+        "Kernel virtualization benchmarks",
+        "Cgroup memory limits and bandwidth throttling",
+        "Technical report with reproducible scripts"
+      ],
+      createdBy: "FAC-CSE-018",
+      createdAt: "2024-10-12T10:00:00Z"
+    }
+  ],
+
+  submissions: [
+    {
+      submissionId: "sub-101",
+      studentId: "CS-2023-084",
+      studentName: "Alex Chen",
+      studentRoll: "CS-2023-084",
+      assignmentId: "asg-3",
+      subjectCode: "CS-601",
+      title: "Assignment 3: TCP/UDP Socket Implementation",
+      version: "v1.0",
+      fileName: "alex_chen_cs2023084_asg3.zip",
+      fileSize: "3.4 MB",
+      checksumSha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      s3Key: "assignments/CS-601/asg-3/CS-2023-084/v1.0/alex_chen_cs2023084_asg3.zip",
+      status: "Pending Review",
+      submittedAt: "2024-10-23T14:15:00Z",
+      comment: "Complete TCP stream framing with thread pool executor and UDP benchmark script.",
+      scores: { correctness: 28, modularity: 19, tests: 23, docs: 15, total: 85 },
+      feedback: "",
+      reviewedBy: null,
+      reviewedAt: null,
+      revisions: [
+        {
+          version: "v1.0",
+          fileName: "alex_chen_cs2023084_asg3.zip",
+          fileSize: "3.4 MB",
+          s3Key: "assignments/CS-601/asg-3/CS-2023-084/v1.0/alex_chen_cs2023084_asg3.zip",
+          submittedAt: "2024-10-23T14:15:00Z",
+          comment: "Initial submission with full test suite."
+        }
+      ]
+    },
+    {
+      submissionId: "sub-102",
+      studentId: "CS-2023-084",
+      studentName: "Alex Chen",
+      studentRoll: "CS-2023-084",
+      assignmentId: "asg-2",
+      subjectCode: "CS-601",
+      title: "Assignment 2: Distance Vector Routing Simulation",
+      version: "v1.1",
+      fileName: "alex_chen_cs2023084_asg2_revised.zip",
+      fileSize: "2.1 MB",
+      checksumSha256: "5d41402abc4b2a76b9719d911017c592",
+      s3Key: "assignments/CS-601/asg-2/CS-2023-084/v1.1/alex_chen_cs2023084_asg2_revised.zip",
+      status: "Needs Revision",
+      submittedAt: "2024-10-24T10:30:00Z",
+      comment: "Updated routing loop suppression using split horizon and poisoned reverse flags.",
+      scores: { correctness: 24, modularity: 20, tests: 18, docs: 15, total: 77 },
+      feedback: "Alex, your distance vector calculation is correct for converging topologies, but line 142 fails to handle the count-to-infinity problem when node 4 drops. Please implement split horizon with poison reverse and resubmit.",
+      reviewedBy: "FAC-CSE-042",
+      reviewedAt: "2024-10-23T11:20:00Z",
+      revisions: [
+        {
+          version: "v1.1",
+          fileName: "alex_chen_cs2023084_asg2_revised.zip",
+          fileSize: "2.1 MB",
+          s3Key: "assignments/CS-601/asg-2/CS-2023-084/v1.1/alex_chen_cs2023084_asg2_revised.zip",
+          submittedAt: "2024-10-24T10:30:00Z",
+          comment: "Revision submitted addressing poison reverse."
+        },
+        {
+          version: "v1.0",
+          fileName: "alex_chen_cs2023084_asg2.zip",
+          fileSize: "1.9 MB",
+          s3Key: "assignments/CS-601/asg-2/CS-2023-084/v1.0/alex_chen_cs2023084_asg2.zip",
+          submittedAt: "2024-10-22T22:14:00Z",
+          comment: "Initial simulation script and topology graph."
+        }
+      ]
+    },
+    {
+      submissionId: "sub-103",
+      studentId: "CS-2023-019",
+      studentName: "Priya Sharma",
+      studentRoll: "CS-2023-019",
+      assignmentId: "asg-raft",
+      subjectCode: "CS-603",
+      title: "Distributed Consensus Raft Implementation",
+      version: "v1.0",
+      fileName: "priya_sharma_raft_v1.zip",
+      fileSize: "4.8 MB",
+      checksumSha256: "7d793037a0760186574b0282f2f435e7",
+      s3Key: "assignments/CS-603/asg-raft/CS-2023-019/v1.0/priya_sharma_raft_v1.zip",
+      status: "Pending Review",
+      submittedAt: "2024-10-23T20:45:00Z",
+      comment: "Implemented leader election, log replication heartbeat, and unit test suite.",
+      scores: { correctness: 27, modularity: 18, tests: 22, docs: 14, total: 81 },
+      feedback: "",
+      reviewedBy: null,
+      reviewedAt: null,
+      revisions: [
+        {
+          version: "v1.0",
+          fileName: "priya_sharma_raft_v1.zip",
+          fileSize: "4.8 MB",
+          s3Key: "assignments/CS-603/asg-raft/CS-2023-019/v1.0/priya_sharma_raft_v1.zip",
+          submittedAt: "2024-10-23T20:45:00Z",
+          comment: "Initial submission."
+        }
+      ]
+    },
+    {
+      submissionId: "sub-104",
+      studentId: "CS-2023-056",
+      studentName: "Rahul Patil",
+      studentRoll: "CS-2023-056",
+      assignmentId: "asg-cloud-1",
+      subjectCode: "CS-602",
+      title: "Cloud Virtualization Mini-Lab",
+      version: "v1.0",
+      fileName: "rahul_patil_lab3.pdf",
+      fileSize: "1.9 MB",
+      checksumSha256: "8e016422864520e54366e7b51f08404f",
+      s3Key: "assignments/CS-602/asg-cloud-1/CS-2023-056/v1.0/rahul_patil_lab3.pdf",
+      status: "Pending Review",
+      submittedAt: "2024-10-22T23:20:00Z",
+      comment: "KVM hypervisor benchmarks and Docker container memory isolation graphs.",
+      scores: { correctness: 26, modularity: 19, tests: 20, docs: 14, total: 79 },
+      feedback: "",
+      reviewedBy: null,
+      reviewedAt: null,
+      revisions: [
+        {
+          version: "v1.0",
+          fileName: "rahul_patil_lab3.pdf",
+          fileSize: "1.9 MB",
+          s3Key: "assignments/CS-602/asg-cloud-1/CS-2023-056/v1.0/rahul_patil_lab3.pdf",
+          submittedAt: "2024-10-22T23:20:00Z",
+          comment: "Initial PDF report."
+        }
+      ]
+    }
+  ]
+};

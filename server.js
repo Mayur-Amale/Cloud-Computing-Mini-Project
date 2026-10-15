@@ -1,9 +1,8 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-
-const PORT = process.env.PORT || 3000;
-const ROOT_DIR = __dirname;
+const config = require('./backend/config');
+const { handleApiRequest } = require('./backend/routes/api');
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -21,20 +20,28 @@ const MIME_TYPES = {
   '.txt': 'text/plain; charset=utf-8'
 };
 
-const server = http.createServer((req, res) => {
-  // Parse URL and decode path
-  let reqPath = decodeURI(req.url.split('?')[0]);
+const server = http.createServer(async (req, res) => {
+  const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+
+  // Handle Backend API Routes
+  if (parsedUrl.pathname.startsWith('/api/')) {
+    await handleApiRequest(req, res, parsedUrl);
+    return;
+  }
+
+  // Handle Static File Serving
+  let reqPath = decodeURI(parsedUrl.pathname);
   if (reqPath === '/' || reqPath === '') {
     reqPath = '/index.html';
   }
 
   // Prevent directory traversal
   const safePath = path.normalize(reqPath).replace(/^(\.\.[\/\\])+/, '');
-  let filePath = path.join(ROOT_DIR, safePath);
+  let filePath = path.join(config.ROOT_DIR, safePath);
 
   fs.stat(filePath, (err, stats) => {
     if (err) {
-      res.writeHead(404, { 'Content-Type': 'text/plain' });
+      res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
       res.end('404 Not Found');
       return;
     }
@@ -51,7 +58,7 @@ const server = http.createServer((req, res) => {
 
     fs.readFile(filePath, (readErr, content) => {
       if (readErr) {
-        res.writeHead(500, { 'Content-Type': 'text/plain' });
+        res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
         res.end('500 Internal Server Error: ' + readErr.message);
         return;
       }
@@ -66,7 +73,16 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`Student Drive Portal running at http://localhost:${PORT}`);
-  console.log(`Serving files from ${ROOT_DIR}`);
+server.listen(config.PORT, () => {
+  console.log('===========================================================');
+  console.log(` Student Drive Academic Portal Server running`);
+  console.log(` URL:          http://localhost:${config.PORT}`);
+  console.log(` Storage Mode: ${config.STORAGE_MODE.toUpperCase()} ${config.STORAGE_MODE === 'aws' ? '(Amazon DynamoDB + S3)' : '(Local Persistent JSON)'}`);
+  if (config.STORAGE_MODE === 'aws') {
+    console.log(` DynamoDB:     ${config.AWS.DYNAMODB_TABLE} (Region: ${config.AWS.REGION})`);
+    console.log(` S3 Bucket:    ${config.AWS.S3_BUCKET}`);
+  } else {
+    console.log(` Database:     ${config.LOCAL_DB_FILE}`);
+  }
+  console.log('===========================================================');
 });
