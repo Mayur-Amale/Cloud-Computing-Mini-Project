@@ -87,22 +87,26 @@ You can also directly open `index.html` or any individual screen in `stitch_stud
 
 ## 🔒 Security & AWS Integration Architecture
 
-The project includes a backend API with local JSON persistence and optional DynamoDB/S3 adapters. It contains no hardcoded AWS secrets. Local mode is a demo; AWS mode requires configured resources and has not been verified against a live AWS account from this workspace.
+The project includes a backend API with local JSON persistence and DynamoDB/S3 adapters. It contains no hardcoded AWS secrets. Local mode is a demo. AWS mode uses a local `.env` file for non-secret resource identifiers and an AWS SDK credential profile for access.
 
 ### Backend storage modes
 - By default, `npm start` uses the local persistent JSON database at `data/student_drive_db.json` and stores uploaded files under `data/uploads/` for teacher preview/download.
-- Set `STORAGE_MODE=aws`, `AWS_REGION`, `DYNAMODB_TABLE`, and `S3_BUCKET` to select AWS services. Configure AWS credentials through the standard AWS SDK credential chain; never place keys in frontend code.
-- AWS mode defaults to Cognito ID-token verification. Set `COGNITO_USER_POOL_ID` and `COGNITO_CLIENT_ID`, replace the demo login with Cognito sign-in, and provision matching portal user records before using it.
+- Copy `.env.example` to `.env` and fill in Cognito outputs. It selects `STORAGE_MODE=aws`, `AUTH_MODE=cognito`, and the stack's S3 bucket/table. `.env` is git-ignored. Configure `AWS_PROFILE` with IAM Identity Center; never place access keys in frontend code.
+- In AWS mode the login form signs in through Cognito `USER_PASSWORD_AUTH`; the backend verifies Cognito ID tokens and checks the user's custom roll number/group against a portal profile in DynamoDB.
 - For DynamoDB Local, set `DYNAMODB_ENDPOINT` (and optionally `S3_ENDPOINT` for an S3-compatible service); the app uses demo authentication unless `AUTH_MODE` is explicitly set to `cognito`.
 - `node scripts/setup-dynamodb.js` creates the single-table design and seeds sample records. Review the script and target account before running it.
 - For a guided CloudFormation setup, see [`aws/README.md`](aws/README.md) and review [`aws/student-drive-stack.yaml`](aws/student-drive-stack.yaml) before deploying.
 
+### Start the AWS demo on Windows
+- Double-click `start-aws-demo.cmd` after reboot. It refreshes the IAM Identity Center session, then starts the server using `.env`.
+- Keep the command window open while presenting and open `http://localhost:3001` in the browser. Sign in through the Cognito student or faculty account.
+
 To connect this application to real AWS production infrastructure:
 
 ### 1. Authentication (AWS Cognito)
-- **User Pool & App Client:** Create a Cognito User Pool with custom attributes (`custom:roll_number`, `custom:role`).
-- **Cognito Groups:** Define `Students` and `Faculty` IAM groups for role-based access control (RBAC).
-- **JWT Verification:** Frontend authenticates against Cognito via AWS Amplify SDK or OAuth2 / OpenID Connect, receiving an `id_token` and `access_token`.
+- **User Pool & App Client:** The CloudFormation stack creates the pool and public app client. The app client enables the password auth flow for local development.
+- **Cognito Groups:** Add student users to `Students` and faculty users to `Faculty`; set each user's `custom:roll_no` to a matching DynamoDB portal profile ID.
+- **JWT Verification:** The login form exchanges credentials for Cognito tokens through the backend. The backend verifies the ID token signature and checks the role/profile before allowing API access.
 
 ### 2. Private S3 Uploads (Pre-Signed URLs)
 - **Private S3 Bucket:** Configure an encrypted Amazon S3 bucket (`s3://student-drive-assignments-dyp-dpu`) with **Block All Public Access** enabled and SSE-KMS encryption.

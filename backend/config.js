@@ -1,4 +1,15 @@
 const path = require('path');
+const fs = require('fs');
+
+// Load a local .env file without overriding values already supplied by the shell.
+const envFile = path.resolve(__dirname, '..', '.env');
+if (fs.existsSync(envFile)) {
+  for (const line of fs.readFileSync(envFile, 'utf8').split(/\r?\n/)) {
+    const match = /^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*?)\s*$/.exec(line);
+    if (!match || process.env[match[1]] !== undefined) continue;
+    process.env[match[1]] = match[2].replace(/^(['"])(.*)\1$/, '$2');
+  }
+}
 
 const hasAwsEnv = Boolean(
   (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) ||

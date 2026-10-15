@@ -223,7 +223,7 @@
               <span id="sidebar-user-role" class="text-[10px] text-secondary leading-tight mt-0.5">Student • CS-2026</span>
             </div>
           </div>
-          <button onclick="toggleActiveRole()" title="Quick Switch Role" class="text-[10px] font-semibold text-primary hover:text-maroon-700 bg-white border border-surface-container-high px-1.5 py-0.5 rounded shadow-2xs hover:bg-surface-container-low transition-colors">
+          <button onclick="toggleActiveRole()" title="Quick Switch Role" class="role-switch-control text-[10px] font-semibold text-primary hover:text-maroon-700 bg-white border border-surface-container-high px-1.5 py-0.5 rounded shadow-2xs hover:bg-surface-container-low transition-colors">
             Switch
           </button>
         </div>
@@ -277,7 +277,7 @@
 
       <!-- Sidebar Footer -->
       <div class="p-space-md flex flex-col gap-space-xs bg-surface-container-lowest border-t border-surface-container-high/70">
-        <a href="#/login" class="flex items-center gap-space-sm px-space-md py-2 rounded-lg text-error hover:bg-error-container hover:text-on-error-container transition-colors font-label-md text-xs font-medium">
+        <a href="#/login" onclick="handleSignOut(event)" class="flex items-center gap-space-sm px-space-md py-2 rounded-lg text-error hover:bg-error-container hover:text-on-error-container transition-colors font-label-md text-xs font-medium">
           <span class="material-symbols-outlined text-[18px]">logout</span>
           <span>Sign Out / Switch Role</span>
         </a>
@@ -324,7 +324,7 @@
             <span class="material-symbols-outlined text-[18px]">fact_check</span> Grading Workspace
           </a>
           <div class="my-2 h-px bg-surface-container-high"></div>
-          <a href="#/login" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-error font-medium">
+          <a href="#/login" onclick="handleSignOut(event)" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-error font-medium">
             <span class="material-symbols-outlined text-[18px]">logout</span> Sign out
           </a>
         </div>
@@ -386,7 +386,7 @@
             <span id="header-user-name" class="font-label-md text-xs font-semibold text-on-surface leading-tight">Alex Chen</span>
             <span id="header-user-role" class="font-label-sm text-[10px] text-secondary leading-none">Student • CS-2023-084</span>
           </div>
-          <button onclick="toggleActiveRole()" title="Click to Switch Role (Student / Teacher)" class="group flex items-center gap-1.5 p-1 rounded-full hover:ring-2 hover:ring-primary/30 transition-all">
+          <button onclick="toggleActiveRole()" title="Click to Switch Role (Student / Teacher)" class="role-switch-control group flex items-center gap-1.5 p-1 rounded-full hover:ring-2 hover:ring-primary/30 transition-all">
             <div id="header-avatar" class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-semibold text-xs shadow-xs">
               AC
             </div>
@@ -687,21 +687,43 @@
     let state = getStoredState();
     let backendSyncActive = false;
     let backendStorageMode = "local";
+    let appAuthMode = "demo";
+    let cognitoChallenge = null;
 
-    // Backend API Client with Role & User Identity Headers
+    function getIdToken() {
+      try { return sessionStorage.getItem("student_drive_id_token"); } catch { return null; }
+    }
+
+    function setCurrentUserFromProfile(user) {
+      const role = user.role === "teacher" ? "teacher" : "student";
+      const profile = Object.assign({}, user, {
+        id: user.userId,
+        initials: user.initials || String(user.name || user.userId).split(/\s+/).map(part => part[0]).join("").slice(0, 2).toUpperCase()
+      });
+      state.currentUser.role = role;
+      if (role === "teacher") state.currentUser.teacher = Object.assign({}, state.currentUser.teacher, profile);
+      else state.currentUser.student = Object.assign({}, state.currentUser.student, profile);
+    }
+
+    // API requests use Cognito tokens in AWS mode and demo identity headers locally.
     async function apiFetch(endpoint, options = {}) {
-      const isStudent = state.currentUser.role === "student";
-      const userId = isStudent ? state.currentUser.student.id : state.currentUser.teacher.id;
-      const headers = Object.assign({
-        "Content-Type": "application/json",
-        "x-user-id": userId,
-        "x-user-role": state.currentUser.role
-      }, options.headers || {});
+      const headers = Object.assign({ "Content-Type": "application/json" }, options.headers || {});
+      const idToken = getIdToken();
+      if (idToken) {
+        headers.Authorization = `Bearer ${idToken}`;
+      } else if (appAuthMode !== "cognito") {
+        const isStudent = state.currentUser.role === "student";
+        const userId = isStudent ? state.currentUser.student.id : state.currentUser.teacher.id;
+        headers["x-user-id"] = userId;
+        headers["x-user-role"] = state.currentUser.role;
+      }
 
       const res = await fetch(endpoint, Object.assign({}, options, { headers }));
       if (!res.ok) {
         const errorBody = await res.json().catch(() => ({ message: res.statusText }));
-        throw new Error(errorBody.message || errorBody.error || `HTTP error ${res.status}`);
+        const error = new Error(errorBody.message || errorBody.error || `HTTP error ${res.status}`);
+        error.statusCode = res.status;
+        throw error;
       }
       return res.json();
     }
@@ -802,6 +824,10 @@
         renderCurrentView();
       } catch (err) {
         console.warn("Backend sync failed, using cached state:", err);
+        if (appAuthMode === "cognito" && err.statusCode === 401) {
+          sessionStorage.removeItem("student_drive_id_token");
+          window.location.hash = "#/login";
+        }
         updateBackendStorageIndicator("offline", false);
       } finally {
         backendSyncActive = false;
@@ -839,6 +865,7 @@
 
     // Role Toggling between Student and Teacher
     async function toggleActiveRole() {
+      if (appAuthMode === "cognito") return;
       if (state.currentUser.role === "student") {
         state.currentUser.role = "teacher";
         state.currentView = "teacher-dashboard";
@@ -949,6 +976,10 @@
     // ==========================================
     function handleRouting() {
       const hash = window.location.hash.replace("#/", "") || "student-dashboard";
+      if (appAuthMode === "cognito" && !getIdToken() && hash !== "login") {
+        window.location.hash = "#/login";
+        return;
+      }
       state.currentView = hash;
       
       // Control Sidebar & Header visibility for Login screen
@@ -978,9 +1009,34 @@
     }
 
     window.addEventListener("hashchange", handleRouting);
-    window.addEventListener("DOMContentLoaded", () => {
+    window.addEventListener("DOMContentLoaded", async () => {
+      try {
+        const response = await fetch("/api/health");
+        if (response.ok) {
+          const health = await response.json();
+          appAuthMode = health.authMode || "demo";
+          backendStorageMode = health.storageMode || "local";
+        }
+      } catch (err) {
+        console.warn("Unable to read backend configuration:", err);
+      }
+      if (appAuthMode === "cognito") {
+        document.querySelectorAll(".role-switch-control").forEach(button => button.classList.add("hidden"));
+        if (!getIdToken()) {
+          window.location.hash = "#/login";
+        } else {
+          try {
+            const me = await apiFetch("/api/auth/me");
+            setCurrentUserFromProfile(me.user);
+            state.currentView = me.user.role === "teacher" ? "teacher-dashboard" : "student-dashboard";
+          } catch (err) {
+            sessionStorage.removeItem("student_drive_id_token");
+            window.location.hash = "#/login";
+          }
+        }
+      }
       handleRouting();
-      syncStateFromBackend();
+      if (appAuthMode !== "cognito" || getIdToken()) syncStateFromBackend();
     });
 
     function renderCurrentView() {
@@ -1107,7 +1163,7 @@
                   </div>
 
                   <!-- Segmented Role Switcher Tabs -->
-                  <div class="relative flex p-1 rounded-lg bg-surface-container-low mb-6 border border-surface-container-high" role="tablist">
+                  <div id="login-role-tabs" class="relative flex p-1 rounded-lg bg-surface-container-low mb-6 border border-surface-container-high" role="tablist">
                     <button id="tab-student-btn" onclick="selectLoginTab('student')" class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md font-semibold text-xs transition-all shadow-xs bg-white text-primary">
                       <span class="material-symbols-outlined text-base">badge</span>
                       <span>Student</span>
@@ -1119,7 +1175,7 @@
                   </div>
 
                   <!-- Quick Demo One-Click Fill -->
-                  <div class="mb-5 p-3 rounded-lg bg-gold-50/80 border border-gold-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div id="login-demo-options" class="mb-5 p-3 rounded-lg bg-gold-50/80 border border-gold-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div class="flex items-center gap-2 text-xs text-gold-900">
                       <span class="material-symbols-outlined text-gold-700 text-lg">bolt</span>
                       <span>Quick Demo Credentials:</span>
@@ -1142,18 +1198,26 @@
                       </label>
                       <div class="relative flex items-center">
                         <span class="material-symbols-outlined absolute left-3 text-outline text-[18px]">person</span>
-                        <input id="login-id" type="text" value="CS-2023-084" required class="w-full pl-9 pr-3 py-2 bg-surface-container-lowest border border-surface-container-high rounded-lg text-xs text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"/>
+                        <input id="login-id" type="text" value="CS-2023-084" autocomplete="username" required class="w-full pl-9 pr-3 py-2 bg-surface-container-lowest border border-surface-container-high rounded-lg text-xs text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"/>
                       </div>
                     </div>
 
                     <div class="flex flex-col gap-1">
                       <div class="flex items-center justify-between">
-                        <label for="login-password" class="font-label-md text-xs font-semibold text-on-surface">Password</label>
-                        <a href="javascript:void(0)" onclick="showToast('Password reset link sent to registered college email.', 'info')" class="text-[11px] text-primary hover:underline">Forgot password?</a>
+                        <label id="login-password-label" for="login-password" class="font-label-md text-xs font-semibold text-on-surface">Password</label>
+                        <a id="forgot-password-link" href="javascript:void(0)" onclick="showToast('Contact the Cognito administrator to reset this account password.', 'info')" class="text-[11px] text-primary hover:underline">Forgot password?</a>
                       </div>
                       <div class="relative flex items-center">
                         <span class="material-symbols-outlined absolute left-3 text-outline text-[18px]">lock</span>
-                        <input id="login-password" type="password" value="••••••••••••" required class="w-full pl-9 pr-3 py-2 bg-surface-container-lowest border border-surface-container-high rounded-lg text-xs text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"/>
+                        <input id="login-password" type="password" autocomplete="current-password" required class="w-full pl-9 pr-3 py-2 bg-surface-container-lowest border border-surface-container-high rounded-lg text-xs text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"/>
+                      </div>
+                    </div>
+
+                    <div id="new-password-confirm-wrapper" class="hidden flex-col gap-1">
+                      <label for="new-password-confirm" class="font-label-md text-xs font-semibold text-on-surface">Confirm new password</label>
+                      <div class="relative flex items-center">
+                        <span class="material-symbols-outlined absolute left-3 text-outline text-[18px]">lock_reset</span>
+                        <input id="new-password-confirm" type="password" autocomplete="new-password" class="w-full pl-9 pr-3 py-2 bg-surface-container-lowest border border-surface-container-high rounded-lg text-xs text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"/>
                       </div>
                     </div>
 
@@ -1176,7 +1240,7 @@
                 </div>
 
                 <!-- Disclaimer Notice -->
-                <div class="pt-6 border-t border-surface-container-high text-[11px] text-secondary flex items-start gap-2">
+                <div id="login-mode-notice" class="pt-6 border-t border-surface-container-high text-[11px] text-secondary flex items-start gap-2">
                   <span class="material-symbols-outlined text-base text-gold shrink-0 mt-0.5">info</span>
                   <p>
                     <strong>Mock Sandbox Active:</strong> Authentication is simulated locally for presentation. Real deployment connects to AWS Cognito User Pool with JWT token validation.
@@ -1228,6 +1292,63 @@
 
     async function handleLoginFormSubmit(e) {
       e.preventDefault();
+      if (appAuthMode === "cognito") {
+        const button = e.currentTarget.querySelector('button[type="submit"]');
+        const username = document.getElementById("login-id").value.trim();
+        const password = document.getElementById("login-password").value;
+        if (button) button.disabled = true;
+        try {
+          let result;
+          if (cognitoChallenge) {
+            const newPassword = document.getElementById("login-password").value;
+            const confirmation = document.getElementById("new-password-confirm").value;
+            if (newPassword !== confirmation) throw new Error("The new passwords do not match.");
+            const response = await fetch("/api/auth/challenge", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ username: cognitoChallenge.username, session: cognitoChallenge.session, newPassword })
+            });
+            result = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(result.error || "Password setup failed.");
+            cognitoChallenge = null;
+          } else {
+            const response = await fetch("/api/auth/login", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ username, password })
+            });
+            result = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(result.error || "Cognito sign-in failed.");
+            if (result.challengeName === "NEW_PASSWORD_REQUIRED") {
+              cognitoChallenge = { username, session: result.session };
+              document.getElementById("login-password").value = "";
+              document.getElementById("login-password").autocomplete = "new-password";
+              document.getElementById("login-password-label").textContent = "Choose a permanent password";
+              const confirmationWrapper = document.getElementById("new-password-confirm-wrapper");
+              confirmationWrapper.classList.remove("hidden");
+              confirmationWrapper.classList.add("flex");
+              document.getElementById("new-password-confirm").required = true;
+              document.getElementById("login-btn-text").textContent = "Set password and sign in";
+              showToast("Temporary password accepted. Choose a permanent password to continue.", "info");
+              return;
+            }
+          }
+          sessionStorage.setItem("student_drive_id_token", result.idToken);
+          const me = await apiFetch("/api/auth/me");
+          setCurrentUserFromProfile(me.user);
+          state.currentView = me.user.role === "teacher" ? "teacher-dashboard" : "student-dashboard";
+          saveState(state);
+          showToast(`Welcome, ${me.user.name || me.user.userId}!`, "success");
+          window.location.hash = `#/${state.currentView}`;
+          await syncStateFromBackend();
+        } catch (err) {
+          sessionStorage.removeItem("student_drive_id_token");
+          showToast(err.message || "Unable to sign in.", "warning");
+        } finally {
+          if (button) button.disabled = false;
+        }
+        return;
+      }
       const isTeacher = activeLoginTab === "teacher";
       state.currentUser.role = isTeacher ? "teacher" : "student";
       saveState(state);
@@ -1237,7 +1358,34 @@
     }
 
     function initLoginScripts() {
-      selectLoginTab(state.currentUser.role);
+      const cognito = appAuthMode === "cognito";
+      document.getElementById("login-role-tabs")?.classList.toggle("hidden", cognito);
+      document.getElementById("login-demo-options")?.classList.toggle("hidden", cognito);
+      document.getElementById("forgot-password-link")?.classList.toggle("hidden", cognito);
+      document.querySelectorAll(".role-switch-control").forEach(button => button.classList.toggle("hidden", cognito));
+      const password = document.getElementById("login-password");
+      if (password) password.required = cognito;
+      if (cognito) {
+        const label = document.getElementById("login-id-label");
+        const input = document.getElementById("login-id");
+        const notice = document.getElementById("login-mode-notice");
+        const buttonText = document.getElementById("login-btn-text");
+        if (label) label.textContent = "Cognito username or email";
+        if (input) input.value = "";
+        const passwordLabel = document.getElementById("login-password-label");
+        if (passwordLabel) passwordLabel.textContent = "Password or temporary password";
+        if (buttonText) buttonText.textContent = "Sign in with Cognito";
+        if (notice) notice.innerHTML = '<span class="material-symbols-outlined text-base text-gold shrink-0 mt-0.5">verified_user</span><p><strong>AWS Cognito sign-in:</strong> Use the account provisioned for this Student Drive portal.</p>';
+      }
+      if (!cognito) selectLoginTab(state.currentUser.role);
+    }
+
+    function handleSignOut(event) {
+      if (appAuthMode !== "cognito") return;
+      event.preventDefault();
+      sessionStorage.removeItem("student_drive_id_token");
+      window.location.hash = "#/login";
+      renderCurrentView();
     }
 
     // =========================================================================
@@ -2259,8 +2407,14 @@
     async function fetchSubmissionFile(submissionId) {
       const isStudent = state.currentUser.role === "student";
       const userId = isStudent ? state.currentUser.student.id : state.currentUser.teacher.id;
+      const headers = {};
+      if (getIdToken()) headers.Authorization = `Bearer ${getIdToken()}`;
+      else {
+        headers["x-user-id"] = userId;
+        headers["x-user-role"] = state.currentUser.role;
+      }
       const response = await fetch(`/api/submissions/${encodeURIComponent(submissionId)}/file`, {
-        headers: { "x-user-id": userId, "x-user-role": state.currentUser.role }
+        headers
       });
       if (!response.ok) {
         const body = await response.json().catch(() => ({}));

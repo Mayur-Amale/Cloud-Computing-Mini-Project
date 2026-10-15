@@ -79,6 +79,7 @@ async function handleApiRequest(req, res, url) {
       return sendJson(200, {
         status: 'ok',
         storageMode: config.STORAGE_MODE,
+        authMode: config.AUTH_MODE,
         aws: {
           region: config.AWS.REGION,
           dynamoDbTable: config.AWS.DYNAMODB_TABLE,
@@ -86,6 +87,109 @@ async function handleApiRequest(req, res, url) {
           dynamoDbEndpoint: config.AWS.DYNAMODB_ENDPOINT || 'AWS Cloud Service'
         },
         timestamp: new Date().toISOString()
+      });
+    }
+
+    // -------------------------------------------------------------
+    // Route: POST /api/auth/login
+    // Exchange username and password for Cognito tokens.
+    // -------------------------------------------------------------
+    if (pathname === '/api/auth/login' && method === 'POST') {
+      if (config.AUTH_MODE !== 'cognito') {
+        return sendError(400, 'Cognito sign-in is not enabled for this server.');
+      }
+      if (!config.COGNITO.USER_POOL_ID || !config.COGNITO.CLIENT_ID) {
+        return sendError(503, 'Cognito is not configured. Add the User Pool ID and App Client ID to .env.');
+      }
+
+      const body = await readBody();
+      if (!body.username || !body.password) {
+        return sendError(400, 'Enter your Cognito username and password.');
+      }
+
+      const response = await fetch(`https://cognito-idp.${config.AWS.REGION}.amazonaws.com/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-amz-json-1.1',
+          'X-Amz-Target': 'AWSCognitoIdentityProviderService.InitiateAuth'
+        },
+        body: JSON.stringify({
+          AuthFlow: 'USER_PASSWORD_AUTH',
+          ClientId: config.COGNITO.CLIENT_ID,
+          AuthParameters: {
+            USERNAME: String(body.username).trim(),
+            PASSWORD: String(body.password)
+          }
+        })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        const reason = result.__type || result.code || '';
+        const message = reason.includes('NotAuthorized') || reason.includes('UserNotFound')
+          ? 'Sign-in failed. Check your Cognito username and password.'
+          : reason.includes('UserNotConfirmed')
+            ? 'Confirm this Cognito user account before signing in.'
+            : 'Cognito sign-in failed. Check the account status and try again.';
+        return sendError(response.status === 400 ? 401 : 502, message);
+      }
+      if (result.ChallengeName) {
+        if (result.ChallengeName === 'NEW_PASSWORD_REQUIRED' && result.Session) {
+          return sendJson(200, { challengeName: result.ChallengeName, session: result.Session });
+        }
+        return sendError(409, `Cognito requires an additional sign-in step (${result.ChallengeName}); this app does not support that challenge yet.`);
+      }
+      const tokens = result.AuthenticationResult;
+      if (!tokens || !tokens.IdToken) return sendError(502, 'Cognito did not return an ID token.');
+      return sendJson(200, {
+        idToken: tokens.IdToken,
+        accessToken: tokens.AccessToken,
+        refreshToken: tokens.RefreshToken,
+        expiresIn: tokens.ExpiresIn
+      });
+    }
+
+    // -------------------------------------------------------------
+    // Route: POST /api/auth/challenge
+    // Complete Cognito's first-login permanent-password challenge.
+    // -------------------------------------------------------------
+    if (pathname === '/api/auth/challenge' && method === 'POST') {
+      if (config.AUTH_MODE !== 'cognito' || !config.COGNITO.CLIENT_ID) {
+        return sendError(503, 'Cognito sign-in is not configured.');
+      }
+      const body = await readBody();
+      if (!body.username || !body.session || !body.newPassword) {
+        return sendError(400, 'Username, sign-in session, and new password are required.');
+      }
+      const response = await fetch(`https://cognito-idp.${config.AWS.REGION}.amazonaws.com/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-amz-json-1.1',
+          'X-Amz-Target': 'AWSCognitoIdentityProviderService.RespondToAuthChallenge'
+        },
+        body: JSON.stringify({
+          ChallengeName: 'NEW_PASSWORD_REQUIRED',
+          ClientId: config.COGNITO.CLIENT_ID,
+          Session: body.session,
+          ChallengeResponses: {
+            USERNAME: String(body.username).trim(),
+            NEW_PASSWORD: String(body.newPassword)
+          }
+        })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        const message = (result.__type || '').includes('InvalidPassword')
+          ? 'Password does not meet the Cognito password policy.'
+          : 'Could not complete the Cognito password setup. Check the password and try again.';
+        return sendError(response.status === 400 ? 400 : 502, message);
+      }
+      const tokens = result.AuthenticationResult;
+      if (!tokens || !tokens.IdToken) return sendError(502, 'Cognito did not return an ID token.');
+      return sendJson(200, {
+        idToken: tokens.IdToken,
+        accessToken: tokens.AccessToken,
+        refreshToken: tokens.RefreshToken,
+        expiresIn: tokens.ExpiresIn
       });
     }
 
@@ -434,12 +538,7 @@ async function handleApiRequest(req, res, url) {
             Bucket: config.AWS.S3_BUCKET,
             Key: s3Key,
             ContentLength: fileSizeBytes,
-            ContentType: contentType || fileType || 'application/octet-stream',
-            Metadata: {
-              studentId: user.userId,
-              assignmentId: assignmentId,
-              version: effectiveVersion
-            }
+          ContentType: contentType || fileType || 'application/octet-stream'
           });
 
           const presignedUrl = await getSignedUrl(s3Client, command, { expiresIn: 900 }); // 15 mins

@@ -7,7 +7,7 @@ The CloudFormation stack is at `aws/student-drive-stack.yaml`. It creates:
 - A Cognito User Pool, a public web app client, and `Students` and `Faculty` groups.
 - A least-privilege IAM managed policy for the backend to read/write this table and upload/read these S3 objects.
 
-It does not create a public website, EC2 instance, Lambda function, IAM user, or access key. The current app still needs its login screen connected to Cognito before AWS mode can be used from the browser.
+It does not create a public website, EC2 instance, Lambda function, IAM user, or access key. The app includes a Cognito sign-in flow, but it still needs local configuration, seeded portal data, and a Cognito student/faculty account before AWS mode is usable.
 
 ## Deploy from the AWS Console
 
@@ -22,9 +22,9 @@ If CloudFormation reports that the stack requires IAM capabilities, acknowledge 
 ## After the stack is ready
 
 1. Configure a backend identity using AWS IAM Identity Center or another approved role-based credential flow, and attach the stack’s `RuntimePolicyArn` to that backend identity. Don’t paste access keys into `index.html`, commit credentials, or send them in chat.
-2. Set the backend environment values from the stack outputs: `STORAGE_MODE=aws`, `AUTH_MODE=cognito`, `AWS_REGION=ap-south-1`, `DYNAMODB_TABLE=StudentDrive_Main`, `S3_BUCKET=<bucket output>`, `COGNITO_USER_POOL_ID=<pool output>`, and `COGNITO_CLIENT_ID=<client output>`.
-3. Replace the demo role switcher with Cognito sign-in. Create each Cognito account as an administrator, set its `custom:roll_no`, and add it to either `Students` or `Faculty`. Seed or create a matching user profile in DynamoDB before signing in; the API checks that the token identity and stored role agree.
-4. Seed the sample courses and assignments with `node scripts/setup-dynamodb.js` after AWS credentials and environment values are configured. This script is idempotent for existing records; it won’t replace records already in the table.
-5. Only then start the app in AWS mode and check health, API sync, a private S3 upload, and a teacher review. The browser should use the app’s actual origin; add that origin to the bucket CORS rules when deploying somewhere other than localhost.
+2. Copy `.env.example` to `.env`, then set `AWS_PROFILE=student-drive` and copy the User Pool ID and App Client ID from the stack outputs. The example already contains the deployed bucket, table, and region values. The backend loads `.env` at startup; `.env` is git-ignored.
+3. Create a Cognito student or faculty user. Set `custom:roll_no` to a profile ID in the seeded portal data (`CS-2023-084` for the demo student or `FAC-CSE-042` for the demo faculty) and add the user to the matching `Students` or `Faculty` group. The app can complete Cognito's first-login temporary-password challenge; other challenges such as MFA are not implemented yet.
+4. Run `node scripts/setup-dynamodb.js` from the project folder in a terminal with the configured IAM Identity Center session. The script seeds sample profiles, subjects, assignments, and submissions without replacing existing records.
+5. Start the app with the `.env` values loaded, sign in through Cognito, then verify the AWS API sync and a private S3 upload. The browser should use the app's actual origin; add that origin to the bucket CORS rules when deploying somewhere other than localhost.
 
-Until the Cognito login integration is complete, keep running the app in local mode. The generated stack itself does not switch the running app to AWS.
+Do not switch the app to AWS mode until `.env`, DynamoDB seed data, a matching Cognito account, and the AWS SSO profile are all ready. The CloudFormation stack itself does not change the running app.
