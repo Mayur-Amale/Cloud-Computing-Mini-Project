@@ -90,11 +90,12 @@ You can also directly open `index.html` or any individual screen in `stitch_stud
 The project includes a backend API with local JSON persistence and optional DynamoDB/S3 adapters. It contains no hardcoded AWS secrets. Local mode is a demo; AWS mode requires configured resources and has not been verified against a live AWS account from this workspace.
 
 ### Backend storage modes
-- By default, `npm start` uses the local persistent JSON database at `data/student_drive_db.json` and a local mock upload endpoint.
+- By default, `npm start` uses the local persistent JSON database at `data/student_drive_db.json` and stores uploaded files under `data/uploads/` for teacher preview/download.
 - Set `STORAGE_MODE=aws`, `AWS_REGION`, `DYNAMODB_TABLE`, and `S3_BUCKET` to select AWS services. Configure AWS credentials through the standard AWS SDK credential chain; never place keys in frontend code.
 - AWS mode defaults to Cognito ID-token verification. Set `COGNITO_USER_POOL_ID` and `COGNITO_CLIENT_ID`, replace the demo login with Cognito sign-in, and provision matching portal user records before using it.
 - For DynamoDB Local, set `DYNAMODB_ENDPOINT` (and optionally `S3_ENDPOINT` for an S3-compatible service); the app uses demo authentication unless `AUTH_MODE` is explicitly set to `cognito`.
 - `node scripts/setup-dynamodb.js` creates the single-table design and seeds sample records. Review the script and target account before running it.
+- For a guided CloudFormation setup, see [`aws/README.md`](aws/README.md) and review [`aws/student-drive-stack.yaml`](aws/student-drive-stack.yaml) before deploying.
 
 To connect this application to real AWS production infrastructure:
 

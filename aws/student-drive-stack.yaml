@@ -1,0 +1,232 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Private storage, submission metadata, and Cognito identity resources for Student Drive.
+
+Resources:
+  SubmissionsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: true
+        RestrictPublicBuckets: true
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      CorsConfiguration:
+        CorsRules:
+          - AllowedOrigins:
+              - http://localhost:3000
+              - http://localhost:3001
+            AllowedMethods:
+              - PUT
+              - GET
+              - HEAD
+            AllowedHeaders:
+              - '*'
+            ExposedHeaders:
+              - ETag
+            MaxAge: 3000
+
+  SubmissionsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SubmissionsBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: '*'
+            Action: s3:*
+            Resource:
+              - !GetAtt SubmissionsBucket.Arn
+              - !Sub '${SubmissionsBucket.Arn}/*'
+            Condition:
+              Bool:
+                aws:SecureTransport: false
+
+  StudentDriveTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: StudentDrive_Main
+      BillingMode: PAY_PER_REQUEST
+      SSESpecification:
+        SSEEnabled: true
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+        - AttributeName: GSI1PK
+          AttributeType: S
+        - AttributeName: GSI1SK
+          AttributeType: S
+        - AttributeName: GSI2PK
+          AttributeType: S
+        - AttributeName: GSI2SK
+          AttributeType: S
+        - AttributeName: GSI3PK
+          AttributeType: S
+        - AttributeName: GSI3SK
+          AttributeType: S
+        - AttributeName: GSI4PK
+          AttributeType: S
+        - AttributeName: GSI4SK
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: GSI1
+          KeySchema:
+            - AttributeName: GSI1PK
+              KeyType: HASH
+            - AttributeName: GSI1SK
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        - IndexName: GSI2
+          KeySchema:
+            - AttributeName: GSI2PK
+              KeyType: HASH
+            - AttributeName: GSI2SK
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        - IndexName: GSI3
+          KeySchema:
+            - AttributeName: GSI3PK
+              KeyType: HASH
+            - AttributeName: GSI3SK
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        - IndexName: GSI4
+          KeySchema:
+            - AttributeName: GSI4PK
+              KeyType: HASH
+            - AttributeName: GSI4SK
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+
+  StudentDriveUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: StudentDriveUsers
+      UsernameAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: true
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 10
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+          RequireUppercase: true
+          TemporaryPasswordValidityDays: 7
+      Schema:
+        - Name: roll_no
+          AttributeDataType: String
+          Mutable: true
+          Required: false
+        - Name: role
+          AttributeDataType: String
+          Mutable: true
+          Required: false
+
+  StudentDriveStudentsGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      GroupName: Students
+      UserPoolId: !Ref StudentDriveUserPool
+      Description: Student accounts for the Student Drive portal.
+
+  StudentDriveFacultyGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      GroupName: Faculty
+      UserPoolId: !Ref StudentDriveUserPool
+      Description: Faculty accounts for the Student Drive portal.
+
+  StudentDriveAppClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: StudentDriveWeb
+      UserPoolId: !Ref StudentDriveUserPool
+      GenerateSecret: false
+      PreventUserExistenceErrors: ENABLED
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      ReadAttributes:
+        - email
+        - email_verified
+        - custom:roll_no
+        - custom:role
+      WriteAttributes:
+        - email
+      AccessTokenValidity: 60
+      IdTokenValidity: 60
+      RefreshTokenValidity: 30
+      TokenValidityUnits:
+        AccessToken: minutes
+        IdToken: minutes
+        RefreshToken: days
+
+  StudentDriveRuntimePolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Least-privilege DynamoDB and S3 access for the Student Drive backend.
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: StudentDriveTableAccess
+            Effect: Allow
+            Action:
+              - dynamodb:DescribeTable
+              - dynamodb:GetItem
+              - dynamodb:PutItem
+              - dynamodb:Query
+              - dynamodb:Scan
+              - dynamodb:UpdateItem
+            Resource:
+              - !GetAtt StudentDriveTable.Arn
+              - !Sub '${StudentDriveTable.Arn}/index/*'
+          - Sid: StudentDriveFileAccess
+            Effect: Allow
+            Action:
+              - s3:GetObject
+              - s3:PutObject
+            Resource: !Sub '${SubmissionsBucket.Arn}/*'
+
+Outputs:
+  AwsRegion:
+    Description: Region selected for this stack.
+    Value: !Ref AWS::Region
+  SubmissionsBucketName:
+    Description: Private S3 bucket name for student files.
+    Value: !Ref SubmissionsBucket
+  DynamoDbTableName:
+    Description: DynamoDB single-table name used by the backend.
+    Value: !Ref StudentDriveTable
+  CognitoUserPoolId:
+    Description: Cognito User Pool ID for backend token verification.
+    Value: !Ref StudentDriveUserPool
+  CognitoAppClientId:
+    Description: Public Cognito app client ID for the web sign-in flow.
+    Value: !Ref StudentDriveAppClient
+  RuntimePolicyArn:
+    Description: Attach this policy to the backend's IAM role or developer permission set.
+    Value: !Ref StudentDriveRuntimePolicy

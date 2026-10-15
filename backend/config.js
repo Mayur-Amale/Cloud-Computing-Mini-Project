@@ -22,7 +22,7 @@ module.exports = {
     CLIENT_ID: process.env.COGNITO_CLIENT_ID || null
   },
   AWS: {
-    REGION: process.env.AWS_REGION || 'us-east-1',
+    REGION: process.env.AWS_REGION || 'ap-south-1',
     DYNAMODB_TABLE: process.env.DYNAMODB_TABLE || 'StudentDrive_Main',
     DYNAMODB_ENDPOINT: process.env.DYNAMODB_ENDPOINT || null,
     S3_BUCKET: process.env.S3_BUCKET || 'student-drive-assignments-dyp-dpu',

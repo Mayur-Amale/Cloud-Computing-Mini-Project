@@ -132,8 +132,8 @@ Cloud-Computing-Mini-Project/
 ## 6. Features Still Missing or Simulated (Demo Sandbox)
 
 - **Authentication:** The login UI remains a demo selector. Local mode trusts demo identity headers and must not be exposed as production authentication. AWS auth mode verifies Cognito ID-token signatures and requires a matching portal user record.
-- **S3 in local mode:** File bytes go to the local mock endpoint and are not retained as files. AWS mode uses pre-signed PUT URLs when AWS credentials and bucket permissions are configured.
-- **Simulated Downloads:** Syllabus and submission downloads verify permissions and show toast notifications rather than downloading actual binary blobs.
+- **File storage:** Local mode stores upload bytes under `data/uploads/` and serves them through an ownership-checked API route. AWS mode uses pre-signed PUT URLs when AWS credentials and bucket permissions are configured.
+- **Syllabus download:** Still presentation-only. Submission files can be previewed/downloaded through the ownership-checked API.
 - **State Storage:** Local API records persist in `data/student_drive_db.json`; `localStorage` is only the frontend cache. DynamoDB mode has not been exercised against a live AWS table in this workspace.
 
 ---
@@ -142,7 +142,7 @@ Cloud-Computing-Mini-Project/
 
 - AWS resources and Cognito settings are not configured here. Do not treat the UI's AWS status badge as proof of a successful live integration; API data sync must succeed too.
 - The demo sign-in screen has not been replaced with Cognito sign-in. In `AUTH_MODE=cognito`, callers need a valid Cognito ID token and a matching portal user record.
-- Downloads are still presentation-only. Local mock uploads count bytes but do not retain the uploaded file.
+- AWS download signing has not been verified against a live bucket. Previously uploaded local demo records made before local file retention was added need to be uploaded again to attach their bytes.
 
 ---
 

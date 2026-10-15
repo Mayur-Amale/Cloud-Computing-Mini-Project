@@ -743,6 +743,12 @@
       });
     }
 
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>\"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"
+      })[char]);
+    }
+
     function updateBackendStorageIndicator(mode, online) {
       const badge = document.getElementById("backend-storage-badge");
       const label = document.getElementById("backend-storage-label");
@@ -1004,6 +1010,7 @@
           break;
         case "teacher-review":
           container.innerHTML = renderTeacherReviewPage();
+          loadReviewArtifactPreview();
           break;
         default:
           container.innerHTML = renderStudentDashboard();
@@ -1953,7 +1960,8 @@
             fileSize: fileSize,
             fileSizeBytes: selectedUploadFile ? selectedUploadFile.size : Math.round(3.4 * 1024 * 1024),
             contentType: selectedUploadFile ? selectedUploadFile.type : "application/zip",
-            assignmentId: assignmentId
+            assignmentId: assignmentId,
+            subjectCode: "CS-601"
           })
         });
 
@@ -1964,10 +1972,15 @@
 
         // 2. Upload file content to S3 (or mock S3 endpoint)
         const uploadPayload = selectedUploadFile || new Blob(["Student assignment binary data"], { type: "application/zip" });
+        const uploadHeaders = Object.assign({}, presign.headers || { "Content-Type": "application/octet-stream" });
+        if (presign.mode === "local-mock") {
+          uploadHeaders["x-user-id"] = state.currentUser.student.id;
+          uploadHeaders["x-user-role"] = "student";
+        }
         const uploadResponse = await fetch(presign.uploadUrl, {
           method: presign.method || "PUT",
           body: uploadPayload,
-          headers: presign.headers || { "Content-Type": "application/octet-stream" }
+          headers: uploadHeaders
         });
         if (!uploadResponse.ok) {
           throw new Error(`File upload failed (HTTP ${uploadResponse.status}). The submission was not recorded.`);
@@ -1983,6 +1996,7 @@
           method: "POST",
           body: JSON.stringify({
             assignmentId: assignmentId,
+            subjectCode: "CS-601",
             fileName: fileName,
             fileSize: fileSize,
             s3Key: presign.s3Key,
@@ -2204,11 +2218,11 @@
                 </div>
 
                 <div class="flex flex-col gap-1 text-[11px] text-secondary">
-                  <span><strong>S3 Object Key:</strong> <code class="font-mono text-[10px] break-all">${sub.s3Key}</code></span>
-                  <span><strong>Integrity Checksum:</strong> <code class="font-mono text-[10px]">sha256:8f4c...3e1a</code></span>
+                  <span><strong>Storage key:</strong> <code class="font-mono text-[10px] break-all">${escapeHtml(sub.s3Key)}</code></span>
+                  <span><strong>File storage:</strong> ${backendStorageMode === "aws" ? "Private S3 bucket" : "Local project data folder"}</span>
                 </div>
 
-                <button onclick="simulateFileDownload('${sub.fileName}')" class="w-full py-2 bg-surface-container hover:bg-surface-container-high text-primary font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 border border-surface-container-high">
+                <button onclick="downloadSubmissionFile('${sub.id}')" class="w-full py-2 bg-surface-container hover:bg-surface-container-high text-primary font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 border border-surface-container-high">
                   <span class="material-symbols-outlined text-[16px]">download</span>
                   <span>Download Submitted Archive</span>
                 </button>
@@ -2242,11 +2256,74 @@
       `;
     }
 
-    function simulateFileDownload(fileName) {
-      showToast(`Generating pre-signed GET URL for ${fileName}...`, "info");
-      setTimeout(() => {
-        showToast(`Verification passed. Downloaded ${fileName}`, "success");
-      }, 1000);
+    async function fetchSubmissionFile(submissionId) {
+      const isStudent = state.currentUser.role === "student";
+      const userId = isStudent ? state.currentUser.student.id : state.currentUser.teacher.id;
+      const response = await fetch(`/api/submissions/${encodeURIComponent(submissionId)}/file`, {
+        headers: { "x-user-id": userId, "x-user-role": state.currentUser.role }
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body.error || `Could not retrieve file (HTTP ${response.status}).`);
+      }
+      return response.blob();
+    }
+
+    async function downloadSubmissionFile(submissionId) {
+      const sub = state.submissions.find(item => item.id === submissionId);
+      if (!sub) return;
+      try {
+        const blob = await fetchSubmissionFile(submissionId);
+        const objectUrl = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = objectUrl;
+        link.download = sub.fileName || "submission-file";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(objectUrl), 30000);
+      } catch (error) {
+        showToast(error.message, "warning");
+      }
+    }
+
+    let reviewPreviewObjectUrl = null;
+    async function loadReviewArtifactPreview() {
+      const sub = state.submissions.find(item => item.id === activeReviewSubId) || state.submissions[0];
+      const host = document.getElementById("submission-file-preview");
+      if (!host || !sub) return;
+      if (reviewPreviewObjectUrl) URL.revokeObjectURL(reviewPreviewObjectUrl);
+      host.textContent = "Loading uploaded file…";
+
+      try {
+        const blob = await fetchSubmissionFile(sub.id);
+        const type = blob.type || "application/octet-stream";
+        const extension = (sub.fileName.split(".").pop() || "").toLowerCase();
+        if (type === "application/pdf" || extension === "pdf") {
+          reviewPreviewObjectUrl = URL.createObjectURL(blob);
+          const frame = document.createElement("iframe");
+          frame.src = reviewPreviewObjectUrl;
+          frame.title = `Preview of ${sub.fileName}`;
+          frame.className = "w-full h-[560px] bg-white";
+          host.replaceChildren(frame);
+        } else if (type.startsWith("image/")) {
+          reviewPreviewObjectUrl = URL.createObjectURL(blob);
+          const image = document.createElement("img");
+          image.src = reviewPreviewObjectUrl;
+          image.alt = `Preview of ${sub.fileName}`;
+          image.className = "max-h-[560px] max-w-full object-contain";
+          host.replaceChildren(image);
+        } else if (type.startsWith("text/") && blob.size <= 1024 * 1024) {
+          const pre = document.createElement("pre");
+          pre.className = "w-full max-h-[560px] overflow-auto whitespace-pre-wrap break-words bg-[#1a1214] p-5 text-left font-mono text-xs text-white";
+          pre.textContent = await blob.text();
+          host.replaceChildren(pre);
+        } else {
+          host.textContent = `Preview is not available for this file type. Use Download to open ${sub.fileName}.`;
+        }
+      } catch (error) {
+        host.textContent = error.message;
+      }
     }
 
     // =========================================================================
@@ -2503,6 +2580,10 @@
     function renderTeacherReviewPage() {
       // Find submission by ID or fallback to Alex Chen's submission
       const sub = state.submissions.find(s => s.id === activeReviewSubId) || state.submissions[0];
+      const safeFileName = escapeHtml(sub.fileName);
+      const safeS3Key = escapeHtml(sub.s3Key);
+      const safeComment = escapeHtml(sub.comment);
+      const safeTitle = escapeHtml(sub.title);
 
       return `
         <div class="flex flex-col w-full gap-space-lg">
@@ -2521,7 +2602,7 @@
                 <span class="text-primary font-semibold">${sub.studentName} (${sub.studentRoll})</span>
               </nav>
               <div class="flex items-center gap-2 flex-wrap mt-0.5">
-                <h1 class="font-headline-lg text-lg font-bold text-on-surface tracking-tight">${sub.title}</h1>
+                <h1 class="font-headline-lg text-lg font-bold text-on-surface tracking-tight">${safeTitle}</h1>
                 <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] ${
                   sub.status === 'Approved' ? 'badge-approved' :
                   sub.status === 'Needs Revision' ? 'badge-revision' : 'badge-gold'
@@ -2562,62 +2643,40 @@
                       <span class="material-symbols-outlined text-[24px]">folder_zip</span>
                     </div>
                     <div>
-                      <span class="font-bold text-sm text-on-surface block">${sub.fileName}</span>
-                      <span class="text-xs text-secondary">${sub.fileSize} • S3 Verified Archive</span>
+                      <span class="font-bold text-sm text-on-surface block">${safeFileName}</span>
+                      <span class="text-xs text-secondary">${sub.fileSize} • ${backendStorageMode === "aws" ? "Private S3 object" : "Local file"}</span>
                     </div>
                   </div>
-                  <button onclick="simulateFileDownload('${sub.fileName}')" class="px-3 py-1.5 bg-surface-container hover:bg-primary hover:text-white rounded-lg text-xs font-semibold text-primary transition-colors flex items-center gap-1 border border-surface-container-high">
+                  <button onclick="downloadSubmissionFile('${sub.id}')" class="px-3 py-1.5 bg-surface-container hover:bg-primary hover:text-white rounded-lg text-xs font-semibold text-primary transition-colors flex items-center gap-1 border border-surface-container-high">
                     <span class="material-symbols-outlined text-[16px]">download</span>
                     <span>Download</span>
                   </button>
                 </div>
 
                 <div class="mt-3 flex items-center justify-between text-[11px] text-secondary font-mono bg-surface-container-low p-2 rounded border border-surface-container-high">
-                  <span>S3: ${sub.s3Key}</span>
-                  <span class="text-emerald-700 font-bold">SHA-256 Valid</span>
+                  <span class="break-all">Storage key: ${safeS3Key}</span>
+                  <span class="text-secondary font-bold">${backendStorageMode === "aws" ? "Private S3" : "Local disk"}</span>
                 </div>
 
                 ${sub.comment ? `
                   <div class="mt-3 p-3 bg-surface-container-low rounded-lg border border-surface-container-high text-xs">
                     <span class="font-bold text-primary block mb-0.5">Student Submission Note:</span>
-                    <p class="text-secondary leading-relaxed">${sub.comment}</p>
+                    <p class="text-secondary leading-relaxed">${safeComment}</p>
                   </div>
                 ` : ''}
               </div>
 
-              <!-- Interactive Source Code Preview -->
+              <!-- Actual uploaded file preview -->
               <div class="bg-surface-container-lowest rounded-xl border border-surface-container-high shadow-xs overflow-hidden">
                 <div class="h-10 bg-surface-container-low px-4 flex items-center justify-between border-b border-surface-container-high">
                   <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-outline text-[16px]">code</span>
-                    <span class="font-mono text-xs font-semibold text-on-surface">server_socket_echo.py</span>
+                    <span class="material-symbols-outlined text-outline text-[16px]">description</span>
+                    <span class="font-mono text-xs font-semibold text-on-surface">${safeFileName}</span>
                   </div>
-                  <span class="text-[10px] text-secondary font-mono">Python 3.10 • 186 LOC</span>
+                  <span class="text-[10px] text-secondary font-mono">Uploaded submission</span>
                 </div>
-                <div class="p-4 bg-[#1a1214] text-white font-mono text-xs overflow-x-auto custom-scroll leading-relaxed">
-<pre><span class="text-gold-300">import</span> socket
-<span class="text-gold-300">import</span> threading
-<span class="text-gold-300">import</span> logging
-
-logging.basicConfig(level=logging.INFO)
-
-<span class="text-gold-300">class</span> <span class="text-emerald-400">StreamEchoServer</span>:
-    <span class="text-gold-300">def</span> <span class="text-blue-300">__init__</span>(self, host: str = <span class="text-amber-300">'0.0.0.0'</span>, port: int = <span class="text-purple-300">8080</span>):
-        self.host = host
-        self.port = port
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, <span class="text-purple-300">1</span>)
-
-    <span class="text-gold-300">def</span> <span class="text-blue-300">handle_client</span>(self, client_sock: socket.socket, addr):
-        <span class="text-gray-400"># Robust framing protocol implementation</span>
-        <span class="text-gold-300">with</span> client_sock:
-            <span class="text-gold-300">while</span> <span class="text-purple-300">True</span>:
-                data = client_sock.recv(<span class="text-purple-300">4096</span>)
-                <span class="text-gold-300">if</span> <span class="text-gold-300">not</span> data:
-                    <span class="text-gold-300">break</span>
-                client_sock.sendall(data)
-        logging.info(<span class="text-amber-300">f"Client disconnected: {addr}"</span>)
-</pre>
+                <div id="submission-file-preview" class="min-h-[280px] bg-surface-container-low flex items-center justify-center p-6 text-sm text-secondary">
+                  Loading uploaded file…
                 </div>
               </div>
 
@@ -2676,7 +2735,7 @@ logging.basicConfig(level=logging.INFO)
                   <label for="teacher-review-feedback" class="font-label-md text-xs font-semibold text-on-surface">
                     Faculty Feedback to Student
                   </label>
-                  <textarea id="teacher-review-feedback" rows="4" class="w-full p-3 bg-surface-container-low border border-surface-container-high rounded-lg text-xs text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary leading-relaxed" placeholder="Write detailed feedback for the student...">${sub.feedback || "Good socket architecture. Addressed the edge case gracefully. Verified on Ubuntu 22.04 LTS."}</textarea>
+                  <textarea id="teacher-review-feedback" rows="4" class="w-full p-3 bg-surface-container-low border border-surface-container-high rounded-lg text-xs text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary leading-relaxed" placeholder="Write detailed feedback for the student...">${escapeHtml(sub.feedback || "")}</textarea>
                 </div>
 
                 <!-- Action Buttons: "Request Changes" vs "Approve" -->

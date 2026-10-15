@@ -1,4 +1,6 @@
-const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const fs = require('fs');
+const path = require('path');
+const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const config = require('../config');
 const { getStorage } = require('../storage');
@@ -224,6 +226,72 @@ async function handleApiRequest(req, res, url) {
     }
 
     // -------------------------------------------------------------
+    // Route: GET /api/submissions/:id/file
+    // Return the real private submission file after checking ownership.
+    // -------------------------------------------------------------
+    const fileMatch = pathname.match(/^\/api\/submissions\/([a-zA-Z0-9_-]+)\/file$/);
+    if (fileMatch && method === 'GET') {
+      const submission = await storage.getSubmission(fileMatch[1]);
+      if (!submission) return sendError(404, 'Submission not found.');
+
+      if (user.role === 'student' && submission.studentId !== user.userId) {
+        return sendError(403, 'Students can only access their own submission files.');
+      }
+      if (user.role === 'teacher') {
+        const subject = await storage.getSubject(submission.subjectCode);
+        if (!subject || subject.instructorId !== user.userId) {
+          return sendError(403, 'You are not assigned to review this submission.');
+        }
+      }
+
+      if (config.STORAGE_MODE === 'aws') {
+        if (!s3Client) return sendError(503, 'AWS S3 file access is unavailable.');
+        const command = new GetObjectCommand({
+          Bucket: config.AWS.S3_BUCKET,
+          Key: submission.s3Key,
+          ResponseContentDisposition: `inline; filename="${path.basename(submission.fileName).replace(/[\"\\\\]/g, '_')}"`
+        });
+        const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 300 });
+        res.writeHead(302, { Location: signedUrl, 'Cache-Control': 'private, no-store' });
+        res.end();
+        return;
+      }
+
+      const keyParts = String(submission.s3Key || '').split('/');
+      if (keyParts.length !== 6 || keyParts[0] !== 'assignments' || keyParts[3] !== submission.studentId || keyParts.some(part => !part || part === '.' || part === '..' || !/^[a-zA-Z0-9._-]+$/.test(part))) {
+        return sendError(404, 'This submission has no locally stored file.');
+      }
+      const uploadRoot = path.resolve(config.DATA_DIR, 'uploads');
+      const filePath = path.resolve(uploadRoot, ...keyParts.slice(1));
+      if (!filePath.startsWith(uploadRoot + path.sep)) return sendError(400, 'Invalid submission file key.');
+
+      let fileBytes;
+      try {
+        fileBytes = await fs.promises.readFile(filePath);
+      } catch (err) {
+        if (err.code === 'ENOENT') return sendError(404, 'This submission has no locally stored file. Re-upload it to attach the file.');
+        throw err;
+      }
+      if (fileBytes.length > 25 * 1024 * 1024) return sendError(413, 'Submission file exceeds the 25 MB limit.');
+
+      const ext = path.extname(submission.fileName).toLowerCase();
+      const contentType = ext === '.pdf' ? 'application/pdf'
+        : ['.txt', '.py'].includes(ext) ? 'text/plain; charset=utf-8'
+        : ['.png', '.jpg', '.jpeg', '.webp'].includes(ext) ? `image/${ext === '.jpg' ? 'jpeg' : ext.slice(1)}`
+        : 'application/octet-stream';
+      const disposition = contentType === 'application/octet-stream' ? 'attachment' : 'inline';
+      res.writeHead(200, {
+        'Content-Type': contentType,
+        'Content-Length': fileBytes.length,
+        'Content-Disposition': `${disposition}; filename="${path.basename(submission.fileName).replace(/[\"\\\\]/g, '_')}"`,
+        'Cache-Control': 'private, no-store',
+        'X-Content-Type-Options': 'nosniff'
+      });
+      res.end(fileBytes);
+      return;
+    }
+
+    // -------------------------------------------------------------
     // Route: POST /api/submissions
     // Students create submissions; stores S3 key & metadata
     // -------------------------------------------------------------
@@ -258,7 +326,7 @@ async function handleApiRequest(req, res, url) {
         studentRoll: studentId,
         assignmentId: body.assignmentId,
         subjectCode,
-        title: body.title || 'Course Submission',
+        title: body.title || assignment.title,
         version,
         fileName: body.fileName,
         fileSize: body.fileSize || '1.0 MB',
@@ -411,18 +479,33 @@ async function handleApiRequest(req, res, url) {
     // -------------------------------------------------------------
     if (pathname === '/api/uploads/mock-s3-upload' && method === 'PUT') {
       const s3Key = url.searchParams.get('s3Key') || 'mock-file';
-      // Read binary chunks
+      const keyParts = s3Key.split('/');
+      if (user.role !== 'student' || keyParts.length !== 6 || keyParts[0] !== 'assignments' || keyParts[3] !== user.userId || keyParts.some(part => !part || part === '.' || part === '..' || !/^[a-zA-Z0-9._-]+$/.test(part))) {
+        return sendError(403, 'Invalid local upload destination.');
+      }
+
+      const chunks = [];
       let totalBytes = 0;
-      req.on('data', chunk => { totalBytes += chunk.length; });
-      req.on('end', () => {
-        return sendJson(200, {
-          message: 'File bytes successfully received by mock S3 endpoint.',
-          s3Key,
-          bytesReceived: totalBytes,
-          etag: '"' + Date.now().toString(16) + '"'
-        });
+      for await (const chunk of req) {
+        totalBytes += chunk.length;
+        if (totalBytes > 25 * 1024 * 1024) {
+          return sendError(413, 'Upload exceeds the 25 MB limit.');
+        }
+        chunks.push(chunk);
+      }
+      if (totalBytes === 0) return sendError(400, 'The uploaded file is empty.');
+
+      const uploadRoot = path.resolve(config.DATA_DIR, 'uploads');
+      const filePath = path.resolve(uploadRoot, ...keyParts.slice(1));
+      if (!filePath.startsWith(uploadRoot + path.sep)) return sendError(400, 'Invalid local upload destination.');
+      await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
+      await fs.promises.writeFile(filePath, Buffer.concat(chunks));
+      return sendJson(200, {
+        message: 'File saved to local storage.',
+        s3Key,
+        bytesReceived: totalBytes,
+        etag: '"' + Date.now().toString(16) + '"'
       });
-      return;
     }
 
     // 404 for unknown API routes
