@@ -149,6 +149,79 @@ async function handleApiRequest(req, res, url) {
     }
 
     // -------------------------------------------------------------
+    // Route: POST /api/auth/forgot-password
+    // Send a Cognito password-reset code to the user's verified address.
+    // -------------------------------------------------------------
+    if (pathname === '/api/auth/forgot-password' && method === 'POST') {
+      if (config.AUTH_MODE !== 'cognito' || !config.COGNITO.CLIENT_ID) {
+        return sendError(503, 'Cognito password reset is not configured.');
+      }
+      const body = await readBody();
+      if (!body.username) return sendError(400, 'Enter your Cognito email address first.');
+
+      const response = await fetch(`https://cognito-idp.${config.AWS.REGION}.amazonaws.com/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-amz-json-1.1',
+          'X-Amz-Target': 'AWSCognitoIdentityProviderService.ForgotPassword'
+        },
+        body: JSON.stringify({ ClientId: config.COGNITO.CLIENT_ID, Username: String(body.username).trim() })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        const reason = result.__type || result.code || '';
+        const message = reason.includes('LimitExceeded')
+          ? 'Too many reset attempts. Wait a while, then request another code.'
+          : reason.includes('InvalidParameter')
+            ? 'This account has no verified recovery email. Ask the Cognito administrator to verify it.'
+            : 'Could not send a reset code. Check the email address and account status.';
+        return sendError(response.status === 400 ? 400 : 502, message);
+      }
+      return sendJson(200, { sent: true, delivery: result.CodeDeliveryDetails || null });
+    }
+
+    // -------------------------------------------------------------
+    // Route: POST /api/auth/confirm-forgot-password
+    // Apply the emailed Cognito reset code and the user's new password.
+    // -------------------------------------------------------------
+    if (pathname === '/api/auth/confirm-forgot-password' && method === 'POST') {
+      if (config.AUTH_MODE !== 'cognito' || !config.COGNITO.CLIENT_ID) {
+        return sendError(503, 'Cognito password reset is not configured.');
+      }
+      const body = await readBody();
+      if (!body.username || !body.code || !body.newPassword) {
+        return sendError(400, 'Email, reset code, and new password are required.');
+      }
+
+      const response = await fetch(`https://cognito-idp.${config.AWS.REGION}.amazonaws.com/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-amz-json-1.1',
+          'X-Amz-Target': 'AWSCognitoIdentityProviderService.ConfirmForgotPassword'
+        },
+        body: JSON.stringify({
+          ClientId: config.COGNITO.CLIENT_ID,
+          Username: String(body.username).trim(),
+          ConfirmationCode: String(body.code).trim(),
+          Password: String(body.newPassword)
+        })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        const reason = result.__type || result.code || '';
+        const message = reason.includes('CodeMismatch') || reason.includes('ExpiredCode')
+          ? 'That reset code is incorrect or expired. Request a new code and try again.'
+          : reason.includes('InvalidPassword')
+            ? 'Password must be at least 10 characters and include uppercase, lowercase, a number, and a symbol.'
+            : reason.includes('LimitExceeded')
+              ? 'Too many reset attempts. Wait a while, then try again.'
+              : 'Could not reset the password. Check the code and account, then try again.';
+        return sendError(response.status === 400 ? 400 : 502, message);
+      }
+      return sendJson(200, { reset: true });
+    }
+
+    // -------------------------------------------------------------
     // Route: POST /api/auth/challenge
     // Complete Cognito's first-login permanent-password challenge.
     // -------------------------------------------------------------

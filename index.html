@@ -689,6 +689,7 @@
     let backendStorageMode = "local";
     let appAuthMode = "demo";
     let cognitoChallenge = null;
+    let cognitoPasswordReset = false;
 
     function getIdToken() {
       try { return sessionStorage.getItem("student_drive_id_token"); } catch { return null; }
@@ -1205,11 +1206,19 @@
                     <div class="flex flex-col gap-1">
                       <div class="flex items-center justify-between">
                         <label id="login-password-label" for="login-password" class="font-label-md text-xs font-semibold text-on-surface">Password</label>
-                        <a id="forgot-password-link" href="javascript:void(0)" onclick="showToast('Contact the Cognito administrator to reset this account password.', 'info')" class="text-[11px] text-primary hover:underline">Forgot password?</a>
+                        <a id="forgot-password-link" href="javascript:void(0)" onclick="handleCognitoPasswordResetLink(event)" class="text-[11px] text-primary hover:underline">Forgot password?</a>
                       </div>
                       <div class="relative flex items-center">
                         <span class="material-symbols-outlined absolute left-3 text-outline text-[18px]">lock</span>
                         <input id="login-password" type="password" autocomplete="current-password" required class="w-full pl-9 pr-3 py-2 bg-surface-container-lowest border border-surface-container-high rounded-lg text-xs text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"/>
+                      </div>
+                    </div>
+
+                    <div id="password-reset-code-wrapper" class="hidden flex-col gap-1">
+                      <label for="password-reset-code" class="font-label-md text-xs font-semibold text-on-surface">Code sent to your email</label>
+                      <div class="relative flex items-center">
+                        <span class="material-symbols-outlined absolute left-3 text-outline text-[18px]">mark_email_read</span>
+                        <input id="password-reset-code" type="text" inputmode="numeric" autocomplete="one-time-code" class="w-full pl-9 pr-3 py-2 bg-surface-container-lowest border border-surface-container-high rounded-lg text-xs text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"/>
                       </div>
                     </div>
 
@@ -1290,6 +1299,55 @@
       showToast(`Selected ${role === 'student' ? 'Alex Chen (Student)' : 'Dr. Evelyn Reed (Teacher)'}`, "info");
     }
 
+    async function handleCognitoPasswordResetLink(event) {
+      event.preventDefault();
+      if (cognitoPasswordReset) {
+        cognitoPasswordReset = false;
+        document.getElementById("password-reset-code-wrapper").classList.add("hidden");
+        document.getElementById("new-password-confirm-wrapper").classList.add("hidden");
+        document.getElementById("password-reset-code").required = false;
+        document.getElementById("new-password-confirm").required = false;
+        document.getElementById("login-password-label").textContent = "Password or temporary password";
+        document.getElementById("login-password").autocomplete = "current-password";
+        document.getElementById("login-btn-text").textContent = "Sign in with Cognito";
+        document.getElementById("forgot-password-link").textContent = "Forgot password?";
+        return;
+      }
+
+      const username = document.getElementById("login-id").value.trim();
+      if (!username) {
+        document.getElementById("login-id").focus();
+        showToast("Enter your Cognito email address first.", "info");
+        return;
+      }
+
+      try {
+        const response = await fetch("/api/auth/forgot-password", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username })
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || "Could not send a password reset code.");
+
+        cognitoPasswordReset = true;
+        document.getElementById("password-reset-code-wrapper").classList.remove("hidden");
+        document.getElementById("password-reset-code-wrapper").classList.add("flex");
+        document.getElementById("new-password-confirm-wrapper").classList.remove("hidden");
+        document.getElementById("new-password-confirm-wrapper").classList.add("flex");
+        document.getElementById("password-reset-code").required = true;
+        document.getElementById("new-password-confirm").required = true;
+        document.getElementById("login-password").value = "";
+        document.getElementById("login-password").autocomplete = "new-password";
+        document.getElementById("login-password-label").textContent = "Choose a new password";
+        document.getElementById("login-btn-text").textContent = "Reset password";
+        document.getElementById("forgot-password-link").textContent = "Cancel";
+        showToast("A password reset code was sent to your verified email address.", "success");
+      } catch (err) {
+        showToast(err.message || "Could not send a password reset code.", "warning");
+      }
+    }
+
     async function handleLoginFormSubmit(e) {
       e.preventDefault();
       if (appAuthMode === "cognito") {
@@ -1299,7 +1357,36 @@
         if (button) button.disabled = true;
         try {
           let result;
-          if (cognitoChallenge) {
+          if (cognitoPasswordReset) {
+            const newPassword = password;
+            const confirmation = document.getElementById("new-password-confirm").value;
+            if (newPassword !== confirmation) throw new Error("The new passwords do not match.");
+            const response = await fetch("/api/auth/confirm-forgot-password", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                username,
+                code: document.getElementById("password-reset-code").value.trim(),
+                newPassword
+              })
+            });
+            result = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(result.error || "Password reset failed.");
+            cognitoPasswordReset = false;
+            document.getElementById("password-reset-code-wrapper").classList.add("hidden");
+            document.getElementById("new-password-confirm-wrapper").classList.add("hidden");
+            document.getElementById("password-reset-code").required = false;
+            document.getElementById("new-password-confirm").required = false;
+            document.getElementById("password-reset-code").value = "";
+            document.getElementById("new-password-confirm").value = "";
+            document.getElementById("login-password").value = "";
+            document.getElementById("login-password").autocomplete = "current-password";
+            document.getElementById("login-password-label").textContent = "Password or temporary password";
+            document.getElementById("login-btn-text").textContent = "Sign in with Cognito";
+            document.getElementById("forgot-password-link").textContent = "Forgot password?";
+            showToast("Password reset. Sign in with your new password.", "success");
+            return;
+          } else if (cognitoChallenge) {
             const newPassword = document.getElementById("login-password").value;
             const confirmation = document.getElementById("new-password-confirm").value;
             if (newPassword !== confirmation) throw new Error("The new passwords do not match.");
@@ -1361,7 +1448,7 @@
       const cognito = appAuthMode === "cognito";
       document.getElementById("login-role-tabs")?.classList.toggle("hidden", cognito);
       document.getElementById("login-demo-options")?.classList.toggle("hidden", cognito);
-      document.getElementById("forgot-password-link")?.classList.toggle("hidden", cognito);
+      document.getElementById("forgot-password-link")?.classList.toggle("hidden", !cognito);
       document.querySelectorAll(".role-switch-control").forEach(button => button.classList.toggle("hidden", cognito));
       const password = document.getElementById("login-password");
       if (password) password.required = cognito;
